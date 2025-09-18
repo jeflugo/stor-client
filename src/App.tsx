@@ -1,11 +1,35 @@
+import { Route, Routes } from 'react-router-dom'
+import Header from './components/Header'
+import { lazy, Suspense } from 'react'
+
+const Market = lazy(() => import('./pages/Market'))
+const Login = lazy(() => import('./pages/Login'))
+const Register = lazy(() => import('./pages/Register'))
+
+// Loading component
+const Loading = () => (
+	<div className='loading-spinner'>
+		<div className='spinner'></div>
+		<p>Loading...</p>
+	</div>
+)
+
 export default function App() {
 	return (
-		<div>
-			app 1<div>app 2</div>
-			<div>app 3</div>
-			<div>app 4</div>
-			<div>app 5</div>
-			<div>app 6</div>
-		</div>
+		<>
+			<Header />
+			<main>
+				<Suspense fallback={<Loading />}>
+					<Routes>
+						<Route path='/' element={<div>Home</div>} />
+						<Route path='/market' element={<Market />} />
+						{/* <Route path='/dashboard' element={<div>Dashboard</div>} /> */}
+						<Route path='/login' element={<Login />} />
+						<Route path='/register' element={<Register />} />
+						<Route path='/*' element={<div>404</div>} />
+					</Routes>
+				</Suspense>
+			</main>
+		</>
 	)
 }
