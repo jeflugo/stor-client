@@ -1,33 +1,32 @@
 import { Route, Routes } from 'react-router-dom'
-import Header from './components/Header'
+// import Header from './components/Header'
 import { lazy, Suspense } from 'react'
 import { Toaster } from 'react-hot-toast'
+import { useAuth } from './context/AuthContext'
+import Loading from './components/Loading'
 
-const Home = lazy(() => import('./pages/Home'))
+// const Home = lazy(() => import('./pages/Home'))
 const Market = lazy(() => import('./pages/Market'))
-const Login = lazy(() => import('./pages/Login'))
+const Welcome = lazy(() => import('./pages/Welcome'))
 const Register = lazy(() => import('./pages/Register'))
-
-// Loading component
-const Loading = () => (
-	<div className='loading-spinner'>
-		<div className='spinner'></div>
-		<p>Loading...</p>
-	</div>
-)
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const Settings = lazy(() => import('./pages/Settings'))
 
 export default function App() {
+	const { user } = useAuth()
 	return (
 		<>
-			<Toaster position='top-center' reverseOrder={false} />
-			<Header />
+			<Toaster position='bottom-left' reverseOrder={false} />
+			{/* <Header /> */}
 			<main>
 				<Suspense fallback={<Loading />}>
 					<Routes>
-						<Route path='/' element={<Home />} />
+						{!user && <Route path='/' element={<Welcome />} />}
+						{/* <Route path='/' element={<Home />} /> */}
+
 						<Route path='/market' element={<Market />} />
-						{/* <Route path='/dashboard' element={<div>Dashboard</div>} /> */}
-						<Route path='/login' element={<Login />} />
+						{user && <Route path='/dashboard' element={<Dashboard />} />}
+						{user && <Route path='/settings' element={<Settings />} />}
 						<Route path='/register' element={<Register />} />
 						<Route path='/*' element={<div>404</div>} />
 					</Routes>
