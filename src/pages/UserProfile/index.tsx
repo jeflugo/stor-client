@@ -32,12 +32,12 @@ export default function UserProfile() {
 				`${import.meta.env.VITE_SERVER_URL}${url}`,
 				options
 			)
-			const userData = await response.json()
 
-			// Handle errors
-			if (response.status === 500) {
-				navigate('/not-found', { replace: true })
-			}
+			// User not found or server errors
+			if (response.status === 500)
+				return navigate('/not-found', { replace: true })
+
+			const userData = await response.json()
 			setUser(userData)
 		}
 
