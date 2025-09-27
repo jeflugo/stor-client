@@ -2,12 +2,10 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import toast from 'react-hot-toast'
-import { useNavigate } from 'react-router-dom'
 
 export const useAuthForm = (isLogin: boolean) => {
 	const { login, register } = useAuth()
 	const [isSubmitting, setIsSubmitting] = useState(false)
-	const navigate = useNavigate()
 
 	const [errors, setErrors] = useState({
 		username: '',
@@ -107,10 +105,6 @@ export const useAuthForm = (isLogin: boolean) => {
 			return false
 		} finally {
 			setIsSubmitting(false)
-
-			// setTimeout(() => {
-			navigate('/dashboard')
-			// }, 2000)
 		}
 	}
 
