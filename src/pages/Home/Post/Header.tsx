@@ -1,12 +1,11 @@
 import { BsThreeDots } from 'react-icons/bs'
 import { FaStar } from 'react-icons/fa'
-import { RiExpandDiagonalLine } from 'react-icons/ri'
+// import { RiExpandDiagonalLine } from 'react-icons/ri'
 
 export default function Header() {
 	return (
-		<div className='flex justify-between items-center'>
+		<div className='flex justify-between items-center px-2'>
 			<div className='flex items-center gap-2'>
-				{/* <div className='h-10 w-10 border-3 border-blue-600 rounded-full'></div> */}
 				<img
 					src='/user.png'
 					alt=''
@@ -22,7 +21,7 @@ export default function Header() {
 			</div>
 			<div className='flex gap-2'>
 				<FaStar size={25} color='gold' />
-				<RiExpandDiagonalLine size={25} />
+				{/* <RiExpandDiagonalLine size={25} /> */}
 				<BsThreeDots size={25} />
 			</div>
 		</div>

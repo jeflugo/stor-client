@@ -1,4 +1,4 @@
-import { CiSearch } from 'react-icons/ci'
+import { BsCart2 } from 'react-icons/bs'
 import { IoIosNotificationsOutline } from 'react-icons/io'
 import { IoAddCircleOutline } from 'react-icons/io5'
 import { LuUser } from 'react-icons/lu'
@@ -10,7 +10,7 @@ export default function Footer() {
 		<div className='sticky bottom-0 bg-white'>
 			<div className='flex justify-evenly mt-auto py-4 border-t '>
 				<Link to='/search'>
-					<CiSearch size={40} />
+					<BsCart2 size={40} />
 				</Link>
 
 				<Link to='/notification'>
