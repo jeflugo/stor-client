@@ -4,9 +4,8 @@
 // import { useAuth } from '../../context/AuthContext'
 
 import { useState } from 'react'
-import { BsTriangleFill } from 'react-icons/bs'
+// import { BsTriangleFill } from 'react-icons/bs'
 import { CiLogout, CiSettings } from 'react-icons/ci'
-import { DiVim } from 'react-icons/di'
 import { FaWhatsapp } from 'react-icons/fa'
 import { HiOutlineDotsVertical } from 'react-icons/hi'
 import { IoMdClose, IoMdSearch } from 'react-icons/io'

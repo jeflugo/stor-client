@@ -13,7 +13,7 @@ export default function Footer() {
 					<BsCart2 size={40} />
 				</Link>
 
-				<Link to='/notification'>
+				<Link to='/notifications'>
 					<IoIosNotificationsOutline size={40} />
 				</Link>
 

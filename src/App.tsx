@@ -7,6 +7,8 @@ import Loading from './components/Loading'
 const Welcome = lazy(() => import('./pages/Welcome'))
 
 const Home = lazy(() => import('./pages/Home'))
+const Notifications = lazy(() => import('./pages/Notifications'))
+const Inbox = lazy(() => import('./pages/Inbox'))
 const UserProfile = lazy(() => import('./pages/UserProfile'))
 const Market = lazy(() => import('./pages/Market'))
 const Settings = lazy(() => import('./pages/Settings'))
@@ -23,6 +25,8 @@ export default function App() {
 				<Suspense fallback={<Loading />}>
 					<Routes>
 						<Route path='/' element={<Home />} />
+						<Route path='/notifications' element={<Notifications />} />
+						<Route path='/inbox' element={<Inbox />} />
 						{/* <Route path='/:username' element={<UserProfile />} /> */}
 						<Route path='/profile' element={<UserProfile />} />
 						<Route path='/market' element={<Market />} />
