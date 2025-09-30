@@ -23,7 +23,8 @@ export default function App() {
 				<Suspense fallback={<Loading />}>
 					<Routes>
 						<Route path='/' element={<Home />} />
-						<Route path='/:username' element={<UserProfile />} />
+						{/* <Route path='/:username' element={<UserProfile />} /> */}
+						<Route path='/profile' element={<UserProfile />} />
 						<Route path='/market' element={<Market />} />
 						<Route path='/settings' element={<Settings />} />
 						<Route path='/not-found' element={<div>404</div>} />

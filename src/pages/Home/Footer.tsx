@@ -21,7 +21,7 @@ export default function Footer() {
 					<IoAddCircleOutline size={40} />
 				</Link>
 
-				<Link to='/messages'>
+				<Link to='/inbox'>
 					<RiMessage3Line size={40} />
 				</Link>
 
