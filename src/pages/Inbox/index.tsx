@@ -11,7 +11,7 @@ export default function Inbox() {
 			<div className='px-2'>
 				<div className='mb-2 flex items-center gap-4'>
 					<LuArrowLeft size={30} onClick={() => navigate(-1)} />
-					<h2 className='text-2xl'>Inbox</h2>
+					<h2 className='text-xl'>Inbox</h2>
 				</div>
 				<div>
 					<div className='flex items-center gap-3 py-1 px-2 border rounded-lg focus-within:border-blue-500'>
