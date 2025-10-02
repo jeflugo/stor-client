@@ -1,56 +1,36 @@
 import type { LoginData, RegisterData, TUser } from '../types/auth'
-
-const VITE_SERVER_URL =
-	import.meta.env.VITE_SERVER_URL || 'http://localhost:3001/api' // Your backend URL
+import { api } from '../utils'
 
 export const authService = {
 	async login(credentials: LoginData): Promise<{ user: TUser; token: string }> {
-		const response = await fetch(`${VITE_SERVER_URL}/users/login`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(credentials),
-		})
+		const { data } = await api.post('/users/login', credentials)
 
-		if (!response.ok) {
-			const error = await response.json()
-			throw new Error(error.message || 'Login failed')
+		if (!data) {
+			throw new Error('Login failed')
 		}
 
-		return response.json()
+		return data
 	},
 
 	async register(
 		userData: RegisterData
 	): Promise<{ user: TUser; token: string }> {
-		const response = await fetch(`${VITE_SERVER_URL}/users/register`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(userData),
-		})
+		const { data } = await api.post('/users/register', userData)
 
-		if (!response.ok) {
-			const error = await response.json()
-			throw new Error(error.message || 'Registration failed')
+		if (!data) {
+			throw new Error('Registration failed')
 		}
 
-		return response.json()
+		return data
 	},
 
 	async getCurrentUser(token: string): Promise<TUser> {
-		const response = await fetch(`${VITE_SERVER_URL}/users/me`, {
-			headers: {
-				Authorization: `Bearer ${token}`,
-			},
-		})
-
-		if (!response.ok) {
+		console.log(token)
+		const { data } = await api.get('/users/me')
+		if (!data) {
 			throw new Error('Failed to get user data')
 		}
 
-		return response.json()
+		return data
 	},
 }
