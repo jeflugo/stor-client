@@ -5,13 +5,15 @@ import { useAuthForm } from '../../hooks/useAuthForm'
 export default function Register({ toggleLogin }: { toggleLogin: () => void }) {
 	const { clearError, errors, handleSubmit, isSubmitting } = useAuthForm(false)
 	const [formData, setFormData] = useState({
+		name: '',
 		username: '',
 		email: '',
 		repeatEmail: '',
 		password: '',
 		repeatPassword: '',
 	})
-	const { username, email, repeatEmail, password, repeatPassword } = formData
+	const { name, username, email, repeatEmail, password, repeatPassword } =
+		formData
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target
@@ -25,6 +27,7 @@ export default function Register({ toggleLogin }: { toggleLogin: () => void }) {
 		const success = await handleSubmit(formData)
 		if (success) {
 			setFormData({
+				name: '',
 				username: '',
 				email: '',
 				repeatEmail: '',
@@ -43,6 +46,20 @@ export default function Register({ toggleLogin }: { toggleLogin: () => void }) {
 			<form className='flex flex-col space-y-4 mt-4' onSubmit={onSubmit}>
 				<input
 					type='text'
+					placeholder='Enter your name'
+					className={
+						`border p-2` + (errors.name && ' border border-red-500 m-0')
+					}
+					onChange={handleChange}
+					name='name'
+					value={name}
+				/>
+				{errors.name && (
+					<span className='text-xs text-red-500'>{errors.name}</span>
+				)}
+
+				<input
+					type='text'
 					placeholder='Enter your username'
 					className={
 						`border p-2` + (errors.username && ' border border-red-500 m-0')
@@ -54,6 +71,7 @@ export default function Register({ toggleLogin }: { toggleLogin: () => void }) {
 				{errors.username && (
 					<span className='text-xs text-red-500'>{errors.username}</span>
 				)}
+
 				<input
 					type='email'
 					placeholder='Enter your email'
