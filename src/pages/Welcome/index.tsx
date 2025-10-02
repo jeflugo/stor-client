@@ -9,12 +9,12 @@ export default function Welcome() {
 
 	return (
 		<div className='flex justify-between'>
-			<div className='border-r p-4 h-screen w-lg hidden lg:block'>
+			<div className='border-r p-4 h-screen w-lg'>
 				<div className='p-4 max-w-[500px]'>
 					<h2 className='text-3xl text-center'>
 						Welcome to <span className='font-bold'>Stor</span>
 					</h2>
-					<div className='py-4 px-8'>
+					<div className='py-4'>
 						{login ? (
 							<Login toggleLogin={toggleLogin} />
 						) : (
@@ -23,7 +23,7 @@ export default function Welcome() {
 					</div>
 				</div>
 			</div>
-			<div className='self-end p-4'>
+			<div className='self-end p-4 hidden md:block'>
 				<h1 className='text-7xl text-wrap w-2xs'>
 					You create the <span className='text-blue-500'>value.</span>
 				</h1>
