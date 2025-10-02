@@ -8,6 +8,7 @@ import type {
 } from '../types/auth'
 import { authService } from '../services/authService'
 import toast from 'react-hot-toast'
+import { useNavigate } from 'react-router-dom'
 
 // Initial state
 const initialState: AuthState = {
@@ -62,6 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 	children,
 }) => {
 	const [state, dispatch] = useReducer(authReducer, initialState)
+	const navigate = useNavigate()
 
 	// Check if user is logged in on app start
 	useEffect(() => {
@@ -120,6 +122,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 		localStorage.removeItem('token')
 		dispatch({ type: 'LOGOUT' })
 		toast.success('Logged out successfully')
+		navigate('/')
 	}
 
 	const clearErrors = () => {
