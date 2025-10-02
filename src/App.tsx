@@ -11,6 +11,8 @@ const Notifications = lazy(() => import('./pages/Notifications'))
 const Inbox = lazy(() => import('./pages/Inbox'))
 const UserProfile = lazy(() => import('./pages/UserProfile'))
 const Market = lazy(() => import('./pages/Market'))
+const Search = lazy(() => import('./pages/Search'))
+const CreatePost = lazy(() => import('./pages/CreatePost'))
 const Settings = lazy(() => import('./pages/Settings'))
 
 export default function App() {
@@ -27,9 +29,10 @@ export default function App() {
 						<Route path='/' element={<Home />} />
 						<Route path='/notifications' element={<Notifications />} />
 						<Route path='/inbox' element={<Inbox />} />
-						{/* <Route path='/:username' element={<UserProfile />} /> */}
-						<Route path='/profile' element={<UserProfile />} />
+						<Route path='/:username' element={<UserProfile />} />
 						<Route path='/market' element={<Market />} />
+						<Route path='/search' element={<Search />} />
+						<Route path='/create-post' element={<CreatePost />} />
 						<Route path='/settings' element={<Settings />} />
 						<Route path='/not-found' element={<div>404</div>} />
 					</Routes>

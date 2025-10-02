@@ -1,9 +1,8 @@
-// import { useEffect, useState } from 'react'
-// import { useNavigate, useParams } from 'react-router-dom'
-// import type { TUser } from '../../types/auth'
-// import { useAuth } from '../../context/AuthContext'
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams, Link } from 'react-router-dom'
+import type { TUser } from '../../types/auth'
+import { useAuth } from '../../context/AuthContext'
 
-import { useState } from 'react'
 // import { BsTriangleFill } from 'react-icons/bs'
 import { CiLogout, CiSettings } from 'react-icons/ci'
 import { FaWhatsapp } from 'react-icons/fa'
@@ -12,57 +11,56 @@ import { IoMdClose, IoMdSearch } from 'react-icons/io'
 import { IoLocationOutline } from 'react-icons/io5'
 import { LuArrowLeft } from 'react-icons/lu'
 import { TbWorldShare } from 'react-icons/tb'
-import { Link, useNavigate } from 'react-router-dom'
 
 export default function UserProfile() {
 	const [search, setSearch] = useState(false)
 	const [options, setOptions] = useState(false)
-	const isOwnProfile = true
+
+	const { logout } = useAuth()
+	const { username } = useParams<{ username: string }>()
+	const { user: currentUser, isAuthenticated } = useAuth()
+
+	const [user, setUser] = useState<TUser>()
 	const navigate = useNavigate()
-	// const { username } = useParams<{ username: string }>()
-	// const { user: currentUser, isAuthenticated } = useAuth()
 
-	// const [user, setUser] = useState<TUser>()
-	// const navigate = useNavigate()
+	// Determine what to fetch
+	const isOwnProfile =
+		!username || username === 'me' || username === currentUser?.username
 
-	// // Determine what to fetch
-	// const isOwnProfile =
-	// 	!username || username === 'me' || username === currentUser?.username
+	useEffect(() => {
+		const fetchProfileData = async () => {
+			let url = '/users/people/' + (username || currentUser?.username)
+			let options = {}
 
-	// useEffect(() => {
-	// 	const fetchProfileData = async () => {
-	// 		let url = '/users/people/' + (username || currentUser?.username)
-	// 		let options = {}
+			if (isOwnProfile && isAuthenticated) {
+				url = '/users/me' // Get private data for own profile
+				options = {
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem('token')}`,
+					},
+				}
+			}
 
-	// 		if (isOwnProfile && isAuthenticated) {
-	// 			url = '/users/me' // Get private data for own profile
-	// 			options = {
-	// 				headers: {
-	// 					Authorization: `Bearer ${localStorage.getItem('token')}`,
-	// 				},
-	// 			}
-	// 		}
+			const response = await fetch(
+				`${import.meta.env.VITE_SERVER_URL}${url}`,
+				options
+			)
 
-	// 		const response = await fetch(
-	// 			`${import.meta.env.VITE_SERVER_URL}${url}`,
-	// 			options
-	// 		)
+			// User not found or server errors
+			if (response.status === 500)
+				return navigate('/not-found', { replace: true })
 
-	// 		// User not found or server errors
-	// 		if (response.status === 500)
-	// 			return navigate('/not-found', { replace: true })
+			const userData = await response.json()
+			setUser(userData)
+		}
 
-	// 		const userData = await response.json()
-	// 		setUser(userData)
-	// 	}
+		// Replace /me or empty with actual username
+		if (isAuthenticated && (!username || username === 'me')) {
+			navigate(`/${currentUser?.username}`, { replace: true })
+		}
 
-	// 	// Replace /me or empty with actual username
-	// 	if (isAuthenticated && (!username || username === 'me')) {
-	// 		navigate(`/${currentUser?.username}`, { replace: true })
-	// 	}
-
-	// 	fetchProfileData()
-	// }, [username, currentUser, isAuthenticated, navigate, isOwnProfile])
+		fetchProfileData()
+	}, [username, currentUser, isAuthenticated, navigate, isOwnProfile])
 
 	const toggleSearch = () => setSearch(!search)
 	const toggleOptions = () => setOptions(!options)
@@ -80,7 +78,9 @@ export default function UserProfile() {
 						<div className='flex justify-between'>
 							<div>
 								<div className='flex items-center gap-2'>
-									<h2 className='text-2xl'>@jeflugo</h2>
+									<h2 className='text-2xl'>
+										@<span>{user?.username}</span>
+									</h2>
 									{/* <div className='flex mt-1'>
 										<FaStar color='gold' size={20} />
 										<FaStar color='gold' size={20} />
@@ -133,7 +133,7 @@ export default function UserProfile() {
 												<h3 className='text-gray-900'>settings</h3>
 											</div>
 										</Link>
-										<div className='flex items-center gap-2'>
+										<div className='flex items-center gap-2' onClick={logout}>
 											<CiLogout size={20} />
 											<h3 className='text-gray-900'>Logout</h3>
 										</div>
