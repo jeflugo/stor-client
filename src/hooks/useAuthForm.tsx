@@ -8,6 +8,7 @@ export const useAuthForm = (isLogin: boolean) => {
 	const [isSubmitting, setIsSubmitting] = useState(false)
 
 	const [errors, setErrors] = useState({
+		name: '',
 		username: '',
 		email: '',
 		repeatEmail: '',
@@ -17,6 +18,7 @@ export const useAuthForm = (isLogin: boolean) => {
 
 	const validateForm = (formData: any) => {
 		const newErrors = {
+			name: '',
 			username: '',
 			email: '',
 			repeatEmail: '',
@@ -28,6 +30,14 @@ export const useAuthForm = (isLogin: boolean) => {
 
 		if (!isLogin) {
 			// Registration validations
+			if (!formData.name) {
+				newErrors.name = 'name is required'
+				isValid = false
+			} else if (formData.name.length < 3) {
+				newErrors.name = 'name must be at least 3 characters'
+				isValid = false
+			}
+
 			if (!formData.username) {
 				newErrors.username = 'Username is required'
 				isValid = false
@@ -93,6 +103,7 @@ export const useAuthForm = (isLogin: boolean) => {
 				await login({ email: formData.email, password: formData.password })
 			} else {
 				await register({
+					name: formData.name,
 					username: formData.username,
 					email: formData.email,
 					password: formData.password,
