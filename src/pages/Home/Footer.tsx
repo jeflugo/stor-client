@@ -4,10 +4,10 @@ import { IoAddCircleOutline } from 'react-icons/io5'
 import { LuUser } from 'react-icons/lu'
 import { RiMessage3Line } from 'react-icons/ri'
 import { Link } from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext'
+import { useUser } from '../../context/UserContext'
 
 export default function Footer() {
-	const { user } = useAuth()
+	const { user } = useUser()
 	return (
 		<div className='sticky bottom-0 bg-white'>
 			<div className='flex justify-evenly mt-auto py-4 border-t '>

@@ -1,10 +1,22 @@
 import { useState } from 'react'
-import { FaGoogle } from 'react-icons/fa'
-import { useAuthForm } from '../../hooks/useAuthForm'
+import { api } from '../../utils'
+import toast from 'react-hot-toast'
+import { useUser } from '../../context/UserContext'
+import type { TUser } from '../../types/users'
 
 export default function Register({ toggleLogin }: { toggleLogin: () => void }) {
-	const { clearError, errors, handleSubmit, isSubmitting } = useAuthForm(false)
+	const { register } = useUser()
+	const [isSubmitting, setIsSubmitting] = useState(false)
+
 	const [formData, setFormData] = useState({
+		name: '',
+		username: '',
+		email: '',
+		repeatEmail: '',
+		password: '',
+		repeatPassword: '',
+	})
+	const [errors, setErrors] = useState({
 		name: '',
 		username: '',
 		email: '',
@@ -22,28 +34,107 @@ export default function Register({ toggleLogin }: { toggleLogin: () => void }) {
 		clearError(name)
 	}
 
-	const onSubmit = async (e: React.FormEvent) => {
-		e.preventDefault()
-		const success = await handleSubmit(formData)
-		if (success) {
-			setFormData({
-				name: '',
-				username: '',
-				email: '',
-				repeatEmail: '',
-				password: '',
-				repeatPassword: '',
-			})
+	const clearError = (fieldName: string) => {
+		setErrors(prev => ({
+			...prev,
+			[fieldName]: '',
+		}))
+	}
+
+	const validateForm = () => {
+		const newErrors = {
+			name: '',
+			username: '',
+			email: '',
+			repeatEmail: '',
+			password: '',
+			repeatPassword: '',
 		}
+
+		let isValid = true
+
+		// Registration validations
+		if (formData.name.length < 3) {
+			newErrors.name = 'name must be at least 3 characters'
+			isValid = false
+		}
+
+		if (formData.username.length < 3) {
+			newErrors.username = 'Username must be at least 3 characters'
+			isValid = false
+		}
+
+		// Email validation (for both login and register)
+		if (!/\S+@\S+\.\S+/.test(formData.email)) {
+			newErrors.email = 'Email is invalid'
+			isValid = false
+		}
+
+		// Confirm email validation
+		if (!formData.repeatEmail) {
+			newErrors.repeatEmail = 'Please confirm your email'
+			isValid = false
+		} else if (formData.email !== formData.repeatEmail) {
+			newErrors.repeatEmail = 'Emails do not match'
+			isValid = false
+		}
+
+		// Password validation
+		if (formData.password.length < 6) {
+			newErrors.password = 'Password must be at least 6 characters'
+			isValid = false
+		}
+
+		// Confirm password validation
+		if (!formData.repeatPassword) {
+			newErrors.repeatPassword = 'Please confirm your password'
+			isValid = false
+		} else if (formData.password !== formData.repeatPassword) {
+			newErrors.repeatPassword = 'Passwords do not match'
+			isValid = false
+		}
+
+		setErrors(newErrors)
+		return isValid
+	}
+
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault()
+		if (!validateForm()) return
+		setIsSubmitting(true)
+		const { data } = await api.post('/users/register', formData)
+
+		if (!data) {
+			toast.error('Registration failed')
+			return setIsSubmitting(false)
+		}
+
+		if (!data.success) {
+			if (data.usernameExist)
+				setErrors(prev => ({ ...prev, username: 'Username already exists' }))
+			if (data.emailExist)
+				setErrors(prev => ({ ...prev, email: 'Email already exists' }))
+			return setIsSubmitting(false)
+		}
+
+		setFormData({
+			name: '',
+			username: '',
+			email: '',
+			repeatEmail: '',
+			password: '',
+			repeatPassword: '',
+		})
+
+		const { user, token }: { user: TUser; token: string } = data
+		register(user, token)
+		toast.success('Registration successful!')
+		setIsSubmitting(false)
 	}
 	return (
 		<>
 			<h2 className='text-2xl text-center'>Register</h2>
-			<div className='mt-4 rounded p-2 border flex items-center justify-center space-x-2 cursor-pointer'>
-				<FaGoogle />
-				<span>Register with google</span>
-			</div>
-			<form className='flex flex-col space-y-4 mt-4' onSubmit={onSubmit}>
+			<form className='flex flex-col space-y-4 mt-4' onSubmit={handleSubmit}>
 				<input
 					type='text'
 					placeholder='Enter your name'
@@ -130,8 +221,15 @@ export default function Register({ toggleLogin }: { toggleLogin: () => void }) {
 				)}
 
 				<button
-					disabled={isSubmitting}
-					className='bg-blue-950 text-white p-2'
+					disabled={
+						isSubmitting ||
+						!name ||
+						!username ||
+						!email ||
+						!password ||
+						!repeatPassword
+					}
+					className='bg-blue-950 text-white p-2 disabled:opacity-50'
 					type='submit'
 				>
 					Register

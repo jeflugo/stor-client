@@ -1,7 +1,7 @@
 import { Route, Routes } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
 import { Toaster } from 'react-hot-toast'
-import { useAuth } from './context/AuthContext'
+import { useUser } from './context/UserContext'
 import Loading from './components/Loading'
 
 const Welcome = lazy(() => import('./pages/Welcome'))
@@ -16,9 +16,15 @@ const CreatePost = lazy(() => import('./pages/CreatePost'))
 const Settings = lazy(() => import('./pages/Settings'))
 
 export default function App() {
-	const { user } = useAuth()
+	const { user } = useUser()
 
-	if (!user) return <Welcome />
+	if (!user)
+		return (
+			<>
+				<Toaster position='bottom-left' reverseOrder={false} />
+				<Welcome />
+			</>
+		)
 
 	return (
 		<>

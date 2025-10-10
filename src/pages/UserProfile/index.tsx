@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
-import type { TUser } from '../../types/auth'
-import { useAuth } from '../../context/AuthContext'
+import type { TUser } from '../../types/users'
+import { useUser } from '../../context/UserContext'
 
 // import { BsTriangleFill } from 'react-icons/bs'
 import { CiLogout, CiSettings } from 'react-icons/ci'
@@ -16,9 +16,8 @@ export default function UserProfile() {
 	const [search, setSearch] = useState(false)
 	const [options, setOptions] = useState(false)
 
-	const { logout } = useAuth()
+	const { user: currentUser, isAuthenticated, logout } = useUser()
 	const { username } = useParams<{ username: string }>()
-	const { user: currentUser, isAuthenticated } = useAuth()
 
 	const [user, setUser] = useState<TUser>()
 	const navigate = useNavigate()
@@ -79,7 +78,7 @@ export default function UserProfile() {
 							<div>
 								<div className='flex items-center gap-2'>
 									<h2 className='text-2xl'>
-										@<span>{user?.username}</span>
+										@<span>{user?.username} </span>
 									</h2>
 									{/* <div className='flex mt-1'>
 										<FaStar color='gold' size={20} />
