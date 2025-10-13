@@ -16,34 +16,33 @@ const CreatePost = lazy(() => import('./pages/CreatePost'))
 const Settings = lazy(() => import('./pages/Settings'))
 
 export default function App() {
-	const { user } = useUser()
+	const { user, loading } = useUser()
 
-	if (!user)
-		return (
-			<>
-				<Toaster position='bottom-left' reverseOrder={false} />
-				<Welcome />
-			</>
-		)
-
+	if (loading) return <Loading />
 	return (
 		<>
 			<Toaster position='bottom-left' reverseOrder={false} />
-			<main>
-				<Suspense fallback={<Loading />}>
-					<Routes>
-						<Route path='/' element={<Home />} />
-						<Route path='/notifications' element={<Notifications />} />
-						<Route path='/inbox' element={<Inbox />} />
-						<Route path='/:username' element={<UserProfile />} />
-						<Route path='/market' element={<Market />} />
-						<Route path='/search' element={<Search />} />
-						<Route path='/create-post' element={<CreatePost />} />
-						<Route path='/settings' element={<Settings />} />
-						<Route path='/not-found' element={<div>404</div>} />
-					</Routes>
-				</Suspense>
-			</main>
+			{user ? <Routing /> : <Welcome />}
 		</>
+	)
+}
+
+const Routing = () => {
+	return (
+		<main>
+			<Suspense fallback={<Loading />}>
+				<Routes>
+					<Route path='/' element={<Home />} />
+					<Route path='/notifications' element={<Notifications />} />
+					<Route path='/inbox' element={<Inbox />} />
+					<Route path='/:username' element={<UserProfile />} />
+					<Route path='/market' element={<Market />} />
+					<Route path='/search' element={<Search />} />
+					<Route path='/create-post' element={<CreatePost />} />
+					<Route path='/settings' element={<Settings />} />
+					<Route path='/not-found' element={<div>404</div>} />
+				</Routes>
+			</Suspense>
+		</main>
 	)
 }
