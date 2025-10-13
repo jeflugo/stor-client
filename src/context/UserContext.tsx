@@ -12,6 +12,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
 	const navigate = useNavigate()
 	const [user, setUser] = useState<TUser | null>(null)
+	const [loading, setLoading] = useState(true)
 	const [isAuthenticated, setIsAuthenticated] = useState(false)
 
 	// Check if user is logged in on app start
@@ -26,14 +27,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
 	const checkAuthStatus = async () => {
 		const token = localStorage.getItem('token')
 		if (token) {
-			const { data } = await api.get('/users/me')
-
-			if (!data) {
-				throw new Error('Failed to get user data')
+			try {
+				const { data } = await api.get('/users/me')
+				setUser(data)
+			} catch (error) {
+				console.log(error)
 			}
-			const { userData } = data
-			setUser(userData)
 		}
+		setLoading(false)
 	}
 
 	const login = async (userDate: TUser, token: string) => {
@@ -54,6 +55,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
 
 	const value: TUserContext = {
 		user,
+		loading,
 		isAuthenticated,
 		login,
 		register,
