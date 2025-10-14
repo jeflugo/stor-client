@@ -1,4 +1,11 @@
-export interface Media {
+export type TAuthor = {
+	_id?: string
+	name: string
+	username: string
+	avatar?: string
+}
+
+export type TMedia = {
 	url: string
 	key: string
 	type: 'image' | 'video'
@@ -7,12 +14,21 @@ export interface Media {
 	duration?: number
 }
 
-export interface Post {
+export type TComment = {
+	_id?: string
+	author: TAuthor
+	content: string
+	createdAt?: string
+}
+
+export type TPost = {
 	_id: string
-	author: string
+	author: TAuthor
 	title: string
 	content: string
-	media: Media[]
+	media: TMedia[]
+	comments: TComment[]
+	likes: string[]
 	createdAt: string
 }
 

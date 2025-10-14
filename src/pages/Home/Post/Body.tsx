@@ -1,9 +1,15 @@
-export default function Body() {
+export default function Body({
+	title,
+	content,
+}: {
+	title: string
+	content: string
+}) {
 	return (
 		<>
 			<div>
-				<h2 className='text-lg font-bold'>New laptops for sale</h2>
-				<p>Lorem ipsum dolor sit amet consectetur, adipisicing elit.</p>
+				<h2 className='text-lg font-bold'>{title}</h2>
+				<p>{content}</p>
 			</div>
 			<div>
 				<img src='/post.jpeg' alt='' />

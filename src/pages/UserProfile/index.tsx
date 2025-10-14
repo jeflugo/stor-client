@@ -11,6 +11,8 @@ import { IoMdClose, IoMdSearch } from 'react-icons/io'
 import { IoLocationOutline } from 'react-icons/io5'
 import { LuArrowLeft } from 'react-icons/lu'
 import { TbWorldShare } from 'react-icons/tb'
+import { api } from '../../utils'
+import type { TPost } from '../../types/posts'
 
 export default function UserProfile() {
 	const [search, setSearch] = useState(false)
@@ -20,6 +22,7 @@ export default function UserProfile() {
 	const { username } = useParams<{ username: string }>()
 
 	const [user, setUser] = useState<TUser>()
+	const [posts, setPosts] = useState<TPost[]>()
 	const navigate = useNavigate()
 
 	// Determine what to fetch
@@ -28,35 +31,25 @@ export default function UserProfile() {
 
 	useEffect(() => {
 		const fetchProfileData = async () => {
-			let url = '/users/people/' + (username || currentUser?.username)
-			let options = {}
+			const url =
+				isOwnProfile && isAuthenticated
+					? 'me'
+					: `people/${username || currentUser?.username}`
 
-			if (isOwnProfile && isAuthenticated) {
-				url = '/users/me' // Get private data for own profile
-				options = {
-					headers: {
-						Authorization: `Bearer ${localStorage.getItem('token')}`,
-					},
-				}
-			}
+			const { data: userData } = await api.get(`/users/${url}`)
+			const { data: postData } = await api.get(`/posts/${url}`)
 
-			const response = await fetch(
-				`${import.meta.env.VITE_SERVER_URL}${url}`,
-				options
-			)
+			if (!userData) throw new Error('Failed to get user data')
 
-			// User not found or server errors
-			if (response.status === 500)
-				return navigate('/not-found', { replace: true })
+			if (!postData) throw new Error('Failed to get posts data')
 
-			const userData = await response.json()
+			setPosts(postData)
 			setUser(userData)
 		}
 
 		// Replace /me or empty with actual username
-		if (isAuthenticated && (!username || username === 'me')) {
+		if (isAuthenticated && (!username || username === 'me'))
 			navigate(`/${currentUser?.username}`, { replace: true })
-		}
 
 		fetchProfileData()
 	}, [username, currentUser, isAuthenticated, navigate, isOwnProfile])
@@ -171,31 +164,13 @@ export default function UserProfile() {
 				</div>
 			</div>
 			<div className='grid grid-cols-3 mt-2'>
-				<img src='/post.jpeg' alt='Poster' />
-				<img src='/post.jpeg' alt='Poster' />
-				<img src='/post.jpeg' alt='Poster' />
-				<img src='/post.jpeg' alt='Poster' />
-				<img src='/post.jpeg' alt='Poster' />
-				<img src='/post.jpeg' alt='Poster' />
-				<img src='/post.jpeg' alt='Poster' />
-				<img src='/post.jpeg' alt='Poster' />
-				<img src='/post.jpeg' alt='Poster' />
-				<img src='/post.jpeg' alt='Poster' />
-				<img src='/post.jpeg' alt='Poster' />
-				<img src='/post.jpeg' alt='Poster' />
-				<img src='/post.jpeg' alt='Poster' />
-				<img src='/post.jpeg' alt='Poster' />
-				<img src='/post.jpeg' alt='Poster' />
-				<img src='/post.jpeg' alt='Poster' />
-				<img src='/post.jpeg' alt='Poster' />
-				<img src='/post.jpeg' alt='Poster' />
-				<img src='/post.jpeg' alt='Poster' />
-				<img src='/post.jpeg' alt='Poster' />
-				<img src='/post.jpeg' alt='Poster' />
-				<img src='/post.jpeg' alt='Poster' />
-				<img src='/post.jpeg' alt='Poster' />
-				<img src='/post.jpeg' alt='Poster' />
-				<img src='/post.jpeg' alt='Poster' />
+				{posts ? (
+					posts.map(post => {
+						return <img key={post._id} src='/post.jpeg' alt='Poster' />
+					})
+				) : (
+					<div>No posts yet</div>
+				)}
 			</div>
 		</div>
 	)
