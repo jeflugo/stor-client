@@ -1,25 +1,25 @@
 import { IoClose } from 'react-icons/io5'
 import SingleComment from './SingleComment'
 import { useEffect, useRef, useState } from 'react'
-import type { TAuthor, TComment, TPost } from '../../../types/posts'
+import type { TComment } from '../../../types/posts'
 import { useUser } from '../../../context/UserContext'
 import { api } from '../../../utils'
 
 export default function Comment({
 	toggleComments,
-	comments,
 	postId,
 }: {
 	toggleComments: () => void
-	comments: TComment[]
 	postId: string
 }) {
 	const { user } = useUser()
 	const [commentContent, setCommentContent] = useState('')
+	const [comments, setComments] = useState<TComment[]>([])
 	const [ownComments, setOwnComments] = useState<TComment[]>([])
 	const textareaRef = useRef<HTMLTextAreaElement>(null)
+	const stablePostId = useRef(postId)
 
-	const { avatar, username, name } = user!
+	const { username, avatar, _id } = user!
 
 	useEffect(() => {
 		// Save the current scroll position
@@ -47,33 +47,36 @@ export default function Comment({
 		}
 	}, [commentContent])
 
-	const sendMessage = async () => {
-		const commentAuthor: TAuthor = {
-			name,
-			username,
-			avatar,
+	// Fetch comments on load
+	useEffect(() => {
+		const fetchComments = async () => {
+			//TODO: SETUP ROUTING
+			const { data } = await api.get(`/posts/comments/${stablePostId.current}`)
+			if (!data) return console.log('error')
+			setComments(data)
 		}
-		const newComment: TComment = {
-			author: commentAuthor,
+		fetchComments()
+	}, [])
+
+	const sendMessage = async () => {
+		const requestInfo = {
+			type: 'comment',
+			author: _id,
 			content: commentContent,
 		}
 
-		const inverseOwnComments = [...ownComments].sort((a, b) => {
-			const indexA = ownComments.indexOf(a)
-			const indexB = ownComments.indexOf(b)
-			return indexB - indexA
-		})
+		const { data } = await api.patch(`/posts/actions/${postId}`, requestInfo)
 
-		const postChanges: Partial<TPost> = {
-			comments: [...comments, ...inverseOwnComments, newComment],
+		if (!data) return console.log('error')
+
+		const newOwnComment: TComment = {
+			author: {
+				username,
+				avatar,
+			},
+			content: commentContent,
 		}
-
-		const { data } = await api.patch(`/posts/actions/${postId}`, postChanges)
-
-		if (!data) console.log('error')
-
-		setOwnComments(prev => [newComment, ...prev])
-
+		setOwnComments(prev => [newOwnComment, ...prev])
 		setCommentContent('')
 	}
 
@@ -88,16 +91,19 @@ export default function Comment({
 				<h3 className='text-lg'>Comments</h3>
 			</div>
 			<div className='h-full overflow-y-scroll pt-4 pb-29'>
-				{ownComments &&
-					ownComments.map(({ _id, author, content }) => (
+				{ownComments.length === 0 && comments.length === 0 && (
+					<div className='text-center'>No comments yet</div>
+				)}
+				{ownComments.length > 0 &&
+					ownComments.map(({ author, content }, index) => (
 						<SingleComment
-							key={_id}
+							key={index}
 							author={author}
 							content={content}
 							time='35 min'
 						/>
 					))}
-				{comments.length > 0 ? (
+				{comments.length > 0 &&
 					comments.map(({ _id, author, content }) => (
 						<SingleComment
 							key={_id}
@@ -105,10 +111,7 @@ export default function Comment({
 							content={content}
 							time='35 min'
 						/>
-					))
-				) : (
-					<div className='text-center'>No comments yet</div>
-				)}
+					))}
 			</div>
 			<div className='absolute w-full bottom-0 bg-white'>
 				<div className='border-t p-3 flex gap-2 items-end'>

@@ -16,15 +16,12 @@ export default function Post({ post }: { post: TPost }) {
 			<Body title={title} content={content} />
 			<Interactions
 				toggleComments={toggleComments}
-				commentsAmount={comments.length}
-				likesAmount={likes.length}
+				comments={comments}
+				likes={likes}
+				postId={_id}
 			/>
 			{showComments && (
-				<Comments
-					toggleComments={toggleComments}
-					comments={comments}
-					postId={_id}
-				/>
+				<Comments toggleComments={toggleComments} postId={_id} />
 			)}
 		</div>
 	)

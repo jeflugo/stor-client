@@ -1,6 +1,5 @@
 export type TAuthor = {
 	_id?: string
-	name: string
 	username: string
 	avatar?: string
 }
@@ -28,7 +27,7 @@ export type TPost = {
 	content: string
 	media: TMedia[]
 	comments: TComment[]
-	likes: string[]
+	likes: TAuthor[]
 	createdAt: string
 }
 
