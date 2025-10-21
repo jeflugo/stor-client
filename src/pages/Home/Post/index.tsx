@@ -9,10 +9,16 @@ export default function Post({ post }: { post: TPost }) {
 	const [showComments, setShowComments] = useState(false)
 	const toggleComments = () => setShowComments(!showComments)
 
-	const { _id, author, title, content, comments, likes } = post
+	const { _id, author, title, content, comments, likes, createdAt } = post
 	return (
 		<div className='mb-6'>
-			<Header author={author} time='2 days ago' />
+			<Header
+				author={author}
+				createdAt={createdAt}
+				postId={_id}
+				title={title}
+				content={content}
+			/>
 			<Body title={title} content={content} />
 			<Interactions
 				toggleComments={toggleComments}

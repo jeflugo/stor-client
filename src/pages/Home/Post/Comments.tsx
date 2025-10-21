@@ -19,7 +19,7 @@ export default function Comment({
 	const textareaRef = useRef<HTMLTextAreaElement>(null)
 	const stablePostId = useRef(postId)
 
-	const { username, avatar, _id } = user!
+	const { avatar, _id } = user!
 
 	useEffect(() => {
 		// Save the current scroll position
@@ -50,7 +50,6 @@ export default function Comment({
 	// Fetch comments on load
 	useEffect(() => {
 		const fetchComments = async () => {
-			//TODO: SETUP ROUTING
 			const { data } = await api.get(`/posts/comments/${stablePostId.current}`)
 			if (!data) return console.log('error')
 			setComments(data)
@@ -65,24 +64,20 @@ export default function Comment({
 			content: commentContent,
 		}
 
-		const { data } = await api.patch(`/posts/actions/${postId}`, requestInfo)
+		const { data: newComment } = await api.patch(
+			`/posts/actions/${postId}`,
+			requestInfo
+		)
+		if (!newComment) return console.log('error')
 
-		if (!data) return console.log('error')
-
-		const newOwnComment: TComment = {
-			author: {
-				username,
-				avatar,
-			},
-			content: commentContent,
-		}
-		setOwnComments(prev => [newOwnComment, ...prev])
+		console.log(newComment)
+		setOwnComments(prev => [newComment, ...prev])
 		setCommentContent('')
 	}
 
 	return (
 		<div
-			className={`rounded-tr-3xl rounded-tl-3xl border h-[80dvh] sticky bottom-0 bg-white z-1`}
+			className={`rounded-tr-3xl rounded-tl-3xl border h-[80dvh] fixed bottom-0 w-full bg-white z-1`}
 		>
 			<div className='flex gap-2 p-2  border-b border-gray-300'>
 				<div onClick={toggleComments}>
@@ -95,21 +90,27 @@ export default function Comment({
 					<div className='text-center'>No comments yet</div>
 				)}
 				{ownComments.length > 0 &&
-					ownComments.map(({ author, content }, index) => (
+					ownComments.map(({ _id, author, content, createdAt, likes }) => (
 						<SingleComment
-							key={index}
+							key={_id!}
 							author={author}
 							content={content}
-							time='35 min'
+							createdAt={createdAt}
+							postId={postId}
+							commentId={_id!}
+							likes={likes}
 						/>
 					))}
 				{comments.length > 0 &&
-					comments.map(({ _id, author, content }) => (
+					comments.map(({ _id, author, content, createdAt, likes }) => (
 						<SingleComment
-							key={_id}
+							key={_id!}
 							author={author}
 							content={content}
-							time='35 min'
+							createdAt={createdAt}
+							postId={postId}
+							commentId={_id!}
+							likes={likes}
 						/>
 					))}
 			</div>
