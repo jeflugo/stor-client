@@ -3,6 +3,8 @@ import { LuArrowLeft } from 'react-icons/lu'
 import { useNavigate } from 'react-router-dom'
 import type { TFormData } from '../../types/posts'
 import { createPost } from '../../services/postService'
+import { CgClose } from 'react-icons/cg'
+import toast from 'react-hot-toast'
 
 export default function CreatePost() {
 	const fileInputRef = useRef<HTMLInputElement>(null)
@@ -17,13 +19,13 @@ export default function CreatePost() {
 		media: null,
 	})
 
-	// const removeImage = () => {
-	// 	setImage(null)
-	// 	setImagePreview('')
-	// 	if (fileInputRef.current) {
-	// 		fileInputRef.current.value = ''
-	// 	}
-	// }
+	const removeImage = () => {
+		setFormData(prev => ({ ...prev, media: null }))
+		setMediaPreview('')
+		if (fileInputRef.current) {
+			fileInputRef.current.value = ''
+		}
+	}
 
 	const handleMediaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0]
@@ -58,10 +60,6 @@ export default function CreatePost() {
 		e.preventDefault()
 
 		const { title, content, media } = formData
-		if (!content.trim() && !media) {
-			alert('Please add some content or an image')
-			return
-		}
 
 		setIsLoading(true)
 
@@ -84,11 +82,11 @@ export default function CreatePost() {
 				fileInputRef.current.value = ''
 			}
 
-			// Notify parent
-			// onPostCreated();
+			navigate('/')
+			toast.success('Post created successfully')
 		} catch (error) {
 			console.error('Error creating post:', error)
-			alert('Failed to create post')
+			toast.error('Error creating post')
 		} finally {
 			setIsLoading(false)
 		}
@@ -97,26 +95,26 @@ export default function CreatePost() {
 		<div className='px-2'>
 			<div className='mb-2 flex items-center gap-4'>
 				<LuArrowLeft size={30} onClick={() => navigate(-1)} />
-				<h2 className='text-xl'>Inbox</h2>
+				<h2 className='text-xl'>Create post</h2>
 			</div>
 
 			<form onSubmit={handleSubmit}>
-				<div>
+				<div className='mb-2'>
 					<input
 						type='text'
 						placeholder='Title'
-						className='border p-2'
+						className='border px-2 py-1 rounded-sm w-full'
 						name='title'
 						value={formData.title}
 						onChange={handleChange}
 					/>
 				</div>
-				<div>
+				<div className='mb-1'>
 					<textarea
 						cols={30}
 						rows={10}
 						placeholder='Content'
-						className='border p-2'
+						className='border px-2 py-1 rounded-sm  w-full'
 						name='content'
 						value={formData.content}
 						onChange={handleChange}
@@ -124,36 +122,35 @@ export default function CreatePost() {
 				</div>
 				{/* Media preview */}
 				{mediaType && mediaPreview && (
-					<div className='mt-4 relative'>
+					<div className='relative mb-2 w-28 h-52 flex justify-center'>
 						{mediaType === 'image' ? (
-							<img
-								src={mediaPreview}
-								alt='Preview'
-								className='max-w-full h-auto max-h-64 rounded-lg'
-							/>
+							<img src={mediaPreview} alt='Preview' className='rounded-lg' />
 						) : (
 							<div className='relative'>
-								<video
-									src={mediaPreview}
-									controls
-									className='max-w-full h-auto max-h-64 rounded-lg'
-								/>
+								<video src={mediaPreview} controls className='rounded-lg' />
 								<div className='absolute bottom-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm'>
 									Video Preview
 								</div>
 							</div>
 						)}
-						{/* <button
-						type='button'
-						onClick={removeImage}
-						className='absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600'
-					>
-						x
-					</button> */}
+						<CgClose
+							type='button'
+							size={25}
+							onClick={removeImage}
+							className='absolute top-2 right-2 bg-black/25 text-white rounded-full p-1'
+						/>
+						{/* File type info */}
+						{formData.media && (
+							<div className='absolute bottom-1 left-1 flex items-center text-xs bg-gray-500/50 text-white px-2 py-1 rounded-md'>
+								<span className=''>
+									{(formData.media.size / 1024 / 1024).toFixed(1)}MB
+								</span>
+							</div>
+						)}
 					</div>
 				)}
 				<div>
-					<label className='bg-gray-300 py-1 px-2 rounded-md'>
+					<label className='bg-blue-500 text-white py-1 px-2 rounded-md'>
 						<input
 							type='file'
 							ref={fileInputRef}
@@ -161,23 +158,23 @@ export default function CreatePost() {
 							accept='image/*,video/*'
 							className='hidden'
 						/>
-
-						<span>Add Media</span>
+						<span>Add media</span>
 					</label>
 				</div>
-				{/* File type info */}
-				{/* {formData.media && (
-					<div className='flex items-center text-sm text-gray-500'>
-						<span className='bg-blue-100 text-blue-800 px-2 py-1 rounded'>
-							{mediaType === 'video' ? 'Video' : 'Image'} •{' '}
-							{(formData.media.size / 1024 / 1024).toFixed(1)}MB
-						</span>
-					</div>
-				)} */}
 
-				<button className='bg-blue-500 text-white p-2 rounded-md mt-4'>
-					{isLoading ? 'Posting...' : 'Post'}
-				</button>
+				<div className='flex justify-end'>
+					<button
+						className='bg-green-500 text-white px-2 py-1 text-lg rounded-md mt-4 font-bold w-44 disabled:opacity-50'
+						disabled={
+							!formData.title ||
+							!formData.content ||
+							!formData.media ||
+							isLoading
+						}
+					>
+						{isLoading ? 'Posting...' : 'Create post'}
+					</button>
+				</div>
 			</form>
 		</div>
 	)
