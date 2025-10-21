@@ -13,13 +13,16 @@ import { LuArrowLeft } from 'react-icons/lu'
 import { TbWorldShare } from 'react-icons/tb'
 import { api } from '../../utils'
 import type { TPost } from '../../types/posts'
+import { MdOutlineEdit } from 'react-icons/md'
+import EditUser from './EditUser'
 
 export default function UserProfile() {
 	const [search, setSearch] = useState(false)
 	const [options, setOptions] = useState(false)
+	const [editUser, setEditUser] = useState(false)
 
 	const { user: currentUser, isAuthenticated, logout } = useUser()
-	const { username } = useParams<{ username: string }>()
+	const { username: profileUsername } = useParams<{ username: string }>()
 
 	const [user, setUser] = useState<TUser>()
 	const [posts, setPosts] = useState<TPost[]>()
@@ -27,35 +30,35 @@ export default function UserProfile() {
 
 	// Determine what to fetch
 	const isOwnProfile =
-		!username || username === 'me' || username === currentUser?.username
+		!profileUsername ||
+		profileUsername === 'me' ||
+		profileUsername === currentUser?.username
 
 	useEffect(() => {
 		const fetchProfileData = async () => {
 			const url =
 				isOwnProfile && isAuthenticated
 					? 'me'
-					: `people/${username || currentUser?.username}`
+					: `people/${profileUsername || currentUser?.username}`
 
 			const { data: userData } = await api.get(`/users/${url}`)
 			const { data: postData } = await api.get(`/posts/${url}`)
-
-			if (!userData) throw new Error('Failed to get user data')
-
-			if (!postData) throw new Error('Failed to get posts data')
 
 			setPosts(postData)
 			setUser(userData)
 		}
 
 		// Replace /me or empty with actual username
-		if (isAuthenticated && (!username || username === 'me'))
+		if (isAuthenticated && (!profileUsername || profileUsername === 'me'))
 			navigate(`/${currentUser?.username}`, { replace: true })
 
 		fetchProfileData()
-	}, [username, currentUser, isAuthenticated, navigate, isOwnProfile])
+	}, [profileUsername, currentUser, isAuthenticated, navigate, isOwnProfile])
 
 	const toggleSearch = () => setSearch(!search)
 	const toggleOptions = () => setOptions(!options)
+
+	const toggleEdit = () => setEditUser(!editUser)
 	return (
 		<div>
 			<div className='px-2'>
@@ -63,8 +66,12 @@ export default function UserProfile() {
 					<LuArrowLeft size={30} />
 				</div>
 				<div className='flex gap-3'>
-					<div className='h-20 w-20 rounded-full border-2 border-blue-500 overflow-hidden'>
-						<img src='/user.png' alt='' className='h-full w-full' />
+					<div className='h-20 w-20 rounded-full overflow-hidden'>
+						{user?.avatar ? (
+							<img src={user?.avatar} alt='' className='h-full w-full' />
+						) : (
+							<img src='/default-user.png' alt='' className='h-full w-full' />
+						)}
 					</div>
 					<div className='flex-1'>
 						<div className='flex justify-between'>
@@ -111,7 +118,7 @@ export default function UserProfile() {
 								<div className='relative'>
 									<HiOutlineDotsVertical size={30} onClick={toggleOptions} />
 									<div
-										className={`absolute top-10 right-2 flex flex-col gap-2 rounded-md p-2 shadow-xl bg-red-300 ${
+										className={`absolute top-7 right-2 flex flex-col gap-2 rounded-md p-2 shadow-xl bg-white border border-gray-200 whitespace-nowrap ${
 											options ? '' : 'hidden'
 										}`}
 									>
@@ -120,12 +127,19 @@ export default function UserProfile() {
 											size={20}
 										/> */}
 										<Link to='/settings'>
-											<div className='flex items-center gap-2'>
+											<div className='flex items-center gap-1'>
 												<CiSettings size={20} />
-												<h3 className='text-gray-900'>settings</h3>
+												<h3 className='text-gray-900'>Settings</h3>
 											</div>
 										</Link>
-										<div className='flex items-center gap-2' onClick={logout}>
+										<div
+											className='flex items-center gap-1'
+											onClick={toggleEdit}
+										>
+											<MdOutlineEdit size={20} />
+											<h3 className='text-gray-900'>Edit profile</h3>
+										</div>
+										<div className='flex items-center gap-1' onClick={logout}>
 											<CiLogout size={20} />
 											<h3 className='text-gray-900'>Logout</h3>
 										</div>
@@ -136,13 +150,12 @@ export default function UserProfile() {
 					</div>
 				</div>
 				<div className='mb-2'>
-					<h3 className='font-semibold text-gray-900'>Jeferson Lugo</h3>
-					<p className='text-sm w-3/4'>
-						Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos velit
-						fugiat magnam tempore dolore iusto tempora, quae porro quidem quam
-						nesciunt fuga quia debitis molestias ullam odio facere voluptatem
-						delectus?
-					</p>
+					<h3 className='font-semibold text-gray-900'>{user?.name}</h3>
+					{user?.bio ? (
+						<p className='text-sm w-3/4'>{user.bio}</p>
+					) : (
+						<p className='text-sm w-3/4 opacity-50'>No bio yet</p>
+					)}
 				</div>
 				<div className='flex justify-between'>
 					<div className='flex gap-3'>
@@ -172,6 +185,7 @@ export default function UserProfile() {
 					<div>No posts yet</div>
 				)}
 			</div>
+			{editUser && <EditUser toggleEdit={toggleEdit} />}
 		</div>
 	)
 }
