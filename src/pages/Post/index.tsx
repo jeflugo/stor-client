@@ -42,10 +42,8 @@ export default function Post() {
 			<Header
 				author={author}
 				createdAt={createdAt}
-				postId={_id}
-				title={title}
-				content={content}
 				togglePostEditor={togglePostEditor}
+				postId={_id}
 			/>
 			<Body title={title} content={content} />
 			<Interactions

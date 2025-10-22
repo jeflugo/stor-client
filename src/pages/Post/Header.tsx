@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import { HiOutlineDotsVertical } from 'react-icons/hi'
 import { useEffect, useState } from 'react'
@@ -7,8 +7,8 @@ import { MdOutlineEdit } from 'react-icons/md'
 import { CiTrash } from 'react-icons/ci'
 import { useUser } from '../../context/UserContext'
 import type { TAuthor } from '../../types/users'
-import { usePost } from '../../context/PostContext'
-import { formatTimeAgo } from '../../utils'
+import { api, formatTimeAgo } from '../../utils'
+import toast from 'react-hot-toast'
 // import { FaStar } from 'react-icons/fa'
 // import { RiExpandDiagonalLine } from 'react-icons/ri'
 
@@ -16,25 +16,21 @@ export default function Header({
 	author,
 	createdAt,
 	location,
-	postId,
-	title,
-	content,
 	togglePostEditor,
+	postId,
 }: {
 	author: TAuthor
 	createdAt: string
 	location?: string
-	postId: string
-	title: string
-	content: string
 	togglePostEditor: () => void
+	postId: string
 }) {
 	const { _id, username, avatar } = author
 	const { user } = useUser()
 	const [options, setOptions] = useState(false)
 	const [itsOwnPost, setItsOwnPost] = useState(false)
-
-	const { toggleDeletePost, setTargetedPostId, setPostEditorInfo } = usePost()
+	const [showDelete, setShowDelete] = useState(false)
+	const navigate = useNavigate()
 
 	useEffect(() => {
 		if (_id === user?._id) setItsOwnPost(true)
@@ -42,19 +38,16 @@ export default function Header({
 
 	const toggleOptions = () => setOptions(!options)
 	const handlePostEditor = () => {
-		setPostEditorInfo({
-			id: postId,
-			title,
-			content,
-			media: null,
-		})
 		togglePostEditor()
 		toggleOptions()
 	}
-	const handleDeletePost = () => {
-		setTargetedPostId(postId)
-		toggleDeletePost()
+	const toggleDelete = () => setShowDelete(!showDelete)
+	const handleDelete = () => {
+		api.delete(`/posts/${postId}`)
+		toast.success('Post deleted successfully')
+		navigate('/')
 	}
+
 	return (
 		<div className='flex justify-between items-center px-2'>
 			<div className='flex items-center gap-2'>
@@ -99,14 +92,26 @@ export default function Header({
 										Edit post
 									</p>
 								</div>
-								<div
-									className='flex items-center gap-1 text-red-500'
-									onClick={handleDeletePost}
-								>
-									<CiTrash size={20} />
-									<p className='hover:opacity-50 active:opacity-50'>
-										Delete post
-									</p>
+								<div onClick={toggleDelete}>
+									<div className='flex items-center gap-1 text-red-500'>
+										<CiTrash size={20} />
+										<p className='hover:opacity-50 active:opacity-50'>
+											Delete post
+										</p>
+									</div>
+									<div
+										className={`absolute bg-white top-15 right-0 shadow-xl border border-gray-200 rounded-sm ${
+											showDelete ? '' : 'hidden'
+										}`}
+									>
+										<div className='flex px-3 py-1 gap-2'>
+											<h4 className='font-bold'>Confirm</h4>
+											<p onClick={handleDelete} className='text-red-500'>
+												yes
+											</p>
+											<p>no</p>
+										</div>
+									</div>
 								</div>
 							</>
 						) : (
