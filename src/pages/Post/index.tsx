@@ -7,12 +7,14 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { api } from '../../utils'
 import type { TPost } from '../../types/posts'
 import { LuArrowLeft } from 'react-icons/lu'
+import PostEditor from './PostEditor'
 
 export default function Post() {
 	const [post, setPost] = useState<TPost>()
 	const navigate = useNavigate()
 	const [likesAmount, setLikesAmount] = useState(0)
 	const [commentsAmount, setCommentsAmount] = useState(0)
+	const [showPostEditor, setShowPostEditor] = useState(false)
 
 	const { postId } = useParams<{ postId: string }>()
 	useEffect(() => {
@@ -27,8 +29,9 @@ export default function Post() {
 		fetchPost()
 	}, [postId])
 
-	if (!post) return <div>loading...</div>
+	const togglePostEditor = () => setShowPostEditor(!showPostEditor)
 
+	if (!post) return <div>loading...</div>
 	const { _id, author, title, content, likes, createdAt } = post
 
 	return (
@@ -42,6 +45,7 @@ export default function Post() {
 				postId={_id}
 				title={title}
 				content={content}
+				togglePostEditor={togglePostEditor}
 			/>
 			<Body title={title} content={content} />
 			<Interactions
@@ -52,6 +56,13 @@ export default function Post() {
 				setLikesAmount={setLikesAmount}
 			/>
 			<Comments postId={_id} setCommentsAmount={setCommentsAmount} />
+			{showPostEditor && (
+				<PostEditor
+					togglePostEditor={togglePostEditor}
+					setPost={setPost}
+					post={post}
+				/>
+			)}
 		</div>
 	)
 }

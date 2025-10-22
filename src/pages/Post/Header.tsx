@@ -19,6 +19,7 @@ export default function Header({
 	postId,
 	title,
 	content,
+	togglePostEditor,
 }: {
 	author: TAuthor
 	createdAt: string
@@ -26,18 +27,14 @@ export default function Header({
 	postId: string
 	title: string
 	content: string
+	togglePostEditor: () => void
 }) {
 	const { _id, username, avatar } = author
 	const { user } = useUser()
 	const [options, setOptions] = useState(false)
 	const [itsOwnPost, setItsOwnPost] = useState(false)
 
-	const {
-		toggleDeletePost,
-		setTargetedPostId,
-		togglePostEditor,
-		setPostEditorInfo,
-	} = usePost()
+	const { toggleDeletePost, setTargetedPostId, setPostEditorInfo } = usePost()
 
 	useEffect(() => {
 		if (_id === user?._id) setItsOwnPost(true)

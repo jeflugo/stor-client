@@ -9,7 +9,7 @@ export default function Body({
 		<>
 			<div>
 				<h2 className='text-lg font-bold'>{title}</h2>
-				<p>{content}</p>
+				<p className='text-wrap'>{content}</p>
 			</div>
 			<div>
 				<img src='/post.jpeg' alt='' />
