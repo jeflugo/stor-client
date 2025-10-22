@@ -8,9 +8,11 @@ import { api } from '../../../utils'
 export default function Comment({
 	toggleComments,
 	postId,
+	setCommentsAmount,
 }: {
 	toggleComments: () => void
 	postId: string
+	setCommentsAmount: React.Dispatch<React.SetStateAction<number>>
 }) {
 	const { user } = useUser()
 	const [commentContent, setCommentContent] = useState('')
@@ -73,6 +75,7 @@ export default function Comment({
 		console.log(newComment)
 		setOwnComments(prev => [newComment, ...prev])
 		setCommentContent('')
+		setCommentsAmount(prev => prev + 1)
 	}
 
 	return (
@@ -99,6 +102,7 @@ export default function Comment({
 							postId={postId}
 							commentId={_id!}
 							likes={likes}
+							setCommentsAmount={setCommentsAmount}
 						/>
 					))}
 				{comments.length > 0 &&
@@ -111,6 +115,7 @@ export default function Comment({
 							postId={postId}
 							commentId={_id!}
 							likes={likes}
+							setCommentsAmount={setCommentsAmount}
 						/>
 					))}
 			</div>

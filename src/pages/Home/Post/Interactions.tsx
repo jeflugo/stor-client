@@ -3,26 +3,28 @@ import { BsShare } from 'react-icons/bs'
 import { FaBookmark, FaHeart, FaRegBookmark, FaRegHeart } from 'react-icons/fa'
 import { RiMessage3Line } from 'react-icons/ri'
 import { useUser } from '../../../context/UserContext'
-import type { TAuthor, TComment } from '../../../types/posts'
+import type { TAuthor } from '../../../types/posts'
 import { api } from '../../../utils'
 
 export default function Interactions({
 	toggleComments,
 	likes,
-	comments,
 	postId,
+	likesAmount,
+	setLikesAmount,
+	commentsAmount,
 }: {
 	toggleComments: () => void
 	likes: TAuthor[]
-	comments: TComment[]
 	postId: string
+	likesAmount: number
+	setLikesAmount: React.Dispatch<React.SetStateAction<number>>
+	commentsAmount: number
 }) {
 	const { user } = useUser()
 	const { _id } = user!
 	const [liked, setLiked] = useState(false)
 	const [saved, setSaved] = useState(false)
-	const likesAmount = likes.length
-	const commentsAmount = comments.length
 
 	useEffect(() => {
 		const isLiked = likes.findIndex(like => like._id === _id)
@@ -40,6 +42,8 @@ export default function Interactions({
 		if (!data) console.log('error')
 
 		setLiked(!liked)
+		if (!liked) setLikesAmount(prev => prev + 1)
+		else setLikesAmount(prev => prev - 1)
 	}
 	const toggleSaved = () => setSaved(!saved)
 	return (

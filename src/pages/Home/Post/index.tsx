@@ -8,8 +8,10 @@ import type { TPost } from '../../../types/posts'
 export default function Post({ post }: { post: TPost }) {
 	const [showComments, setShowComments] = useState(false)
 	const toggleComments = () => setShowComments(!showComments)
+	const [likesAmount, setLikesAmount] = useState(post.likes.length)
+	const [commentsAmount, setCommentsAmount] = useState(post.comments.length)
 
-	const { _id, author, title, content, comments, likes, createdAt } = post
+	const { _id, author, title, content, likes, createdAt } = post
 	return (
 		<div className='mb-6'>
 			<Header
@@ -22,12 +24,18 @@ export default function Post({ post }: { post: TPost }) {
 			<Body title={title} content={content} />
 			<Interactions
 				toggleComments={toggleComments}
-				comments={comments}
 				likes={likes}
 				postId={_id}
+				likesAmount={likesAmount}
+				setLikesAmount={setLikesAmount}
+				commentsAmount={commentsAmount}
 			/>
 			{showComments && (
-				<Comments toggleComments={toggleComments} postId={_id} />
+				<Comments
+					toggleComments={toggleComments}
+					postId={_id}
+					setCommentsAmount={setCommentsAmount}
+				/>
 			)}
 		</div>
 	)

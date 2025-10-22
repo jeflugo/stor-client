@@ -14,6 +14,7 @@ export default function SingleComment({
 	postId,
 	commentId,
 	likes,
+	setCommentsAmount,
 }: {
 	author: TAuthor
 	content: string
@@ -21,6 +22,7 @@ export default function SingleComment({
 	postId: string
 	commentId: string
 	likes: TAuthor[]
+	setCommentsAmount: React.Dispatch<React.SetStateAction<number>>
 }) {
 	const [liked, setLiked] = useState(false)
 	const [isEditing, setIsEditing] = useState(false)
@@ -74,6 +76,7 @@ export default function SingleComment({
 		const { data } = await api.put(`/posts/comments/${postId}`, requestInfo)
 		if (!data) console.log('server error editing')
 		setDeleted(true)
+		setCommentsAmount(prev => prev - 1)
 	}
 	return (
 		<div
