@@ -238,7 +238,11 @@ export default function UserProfile() {
 			<div className='grid grid-cols-3 mt-2'>
 				{posts ? (
 					posts.map(post => {
-						return <img key={post._id} src='/post.jpeg' alt='Poster' />
+						return (
+							<Link key={post._id} to={`/posts/${post._id}`}>
+								<img src='/post.jpeg' alt='Poster' />
+							</Link>
+						)
 					})
 				) : (
 					<div>No posts yet</div>
