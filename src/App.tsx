@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react'
 import { Toaster } from 'react-hot-toast'
 import { useUser } from './context/UserContext'
 import Loading from './components/Loading'
+import Post from './pages/Post'
 
 const Welcome = lazy(() => import('./pages/Welcome'))
 
@@ -40,6 +41,7 @@ const Routing = () => {
 					<Route path='/search' element={<Search />} />
 					<Route path='/create-post' element={<CreatePost />} />
 					<Route path='/settings' element={<Settings />} />
+					<Route path='/posts/:postId' element={<Post />} />
 					<Route path='/not-found' element={<div>404</div>} />
 				</Routes>
 			</Suspense>
