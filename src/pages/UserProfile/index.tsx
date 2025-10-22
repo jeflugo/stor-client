@@ -3,7 +3,6 @@ import { useNavigate, useParams, Link } from 'react-router-dom'
 import type { TUser } from '../../types/users'
 import { useUser } from '../../context/UserContext'
 
-// import { BsTriangleFill } from 'react-icons/bs'
 import { CiLogout, CiSettings } from 'react-icons/ci'
 import { FaWhatsapp } from 'react-icons/fa'
 import { HiOutlineDotsVertical } from 'react-icons/hi'
@@ -15,24 +14,51 @@ import { api } from '../../utils'
 import type { TPost } from '../../types/posts'
 import { MdOutlineEdit } from 'react-icons/md'
 import EditUser from './EditUser'
+import FollowersList from './FollowersList'
+import FollowingList from './FollowingList'
 
 export default function UserProfile() {
 	const [search, setSearch] = useState(false)
 	const [options, setOptions] = useState(false)
 	const [editUser, setEditUser] = useState(false)
-
-	const { user: currentUser, isAuthenticated, logout } = useUser()
-	const { username: profileUsername } = useParams<{ username: string }>()
-
+	const [showFollowing, setShowFollowing] = useState(false)
+	const [showFollowers, setShowFollowers] = useState(false)
+	const [isFollowing, setIsFollowing] = useState(false)
+	const [visualFollowers, setVisualFollowers] = useState(0)
+	const [visualFollows, setVisualFollows] = useState(0)
 	const [user, setUser] = useState<TUser>()
-	const [posts, setPosts] = useState<TPost[]>()
+	const [posts, setPosts] = useState<TPost[]>([])
 	const navigate = useNavigate()
 
+	const {
+		user: currentUser,
+		setUser: setCurrentUser,
+		isAuthenticated,
+		logout,
+	} = useUser()
+
+	const { username: profileUsername } = useParams<{ username: string }>()
 	// Determine what to fetch
 	const isOwnProfile =
 		!profileUsername ||
 		profileUsername === 'me' ||
 		profileUsername === currentUser?.username
+
+	useEffect(() => {
+		if (user) {
+			setVisualFollowers(user.followers!.length)
+			setVisualFollows(user.following!.length)
+		}
+	}, [user])
+
+	useEffect(() => {
+		if (user) {
+			const followingIndex = currentUser!.following!.findIndex(
+				follow => follow._id === user._id
+			)
+			if (followingIndex !== -1) setIsFollowing(true)
+		}
+	}, [user, currentUser])
 
 	useEffect(() => {
 		const fetchProfileData = async () => {
@@ -42,10 +68,9 @@ export default function UserProfile() {
 					: `people/${profileUsername || currentUser?.username}`
 
 			const { data: userData } = await api.get(`/users/${url}`)
-			const { data: postData } = await api.get(`/posts/${url}`)
-
-			setPosts(postData)
-			setUser(userData)
+			const { data: postsData } = await api.get(`/posts/${url}`)
+			if (postsData) setPosts(postsData)
+			if (userData) setUser(userData)
 		}
 
 		// Replace /me or empty with actual username
@@ -59,6 +84,25 @@ export default function UserProfile() {
 	const toggleOptions = () => setOptions(!options)
 
 	const toggleEdit = () => setEditUser(!editUser)
+
+	const toggleFollowing = () => setShowFollowing(!showFollowing)
+	const toggleFollowers = () => setShowFollowers(!showFollowers)
+
+	const handleFollow = async () => {
+		const requestInfo = {
+			isFollowing,
+		}
+		const { data }: { data: TUser } = await api.patch(
+			`/users/follow-action/${user!._id}`,
+			requestInfo
+		)
+		if (!data) console.log('follow error')
+		setIsFollowing(!isFollowing)
+		if (!isFollowing) setVisualFollowers(visualFollowers + 1)
+		else setVisualFollowers(visualFollowers - 1)
+		setCurrentUser(data)
+	}
+
 	return (
 		<div>
 			<div className='px-2'>
@@ -90,9 +134,21 @@ export default function UserProfile() {
 								</div>
 								{!isOwnProfile && (
 									<div className='flex gap-2 mt-1'>
-										<button className='px-2 rounded-md bg-gray-300 font-semibold'>
-											Follow
-										</button>
+										{isFollowing ? (
+											<button
+												className='px-2 rounded-md bg-gray-300 font-semibold'
+												onClick={handleFollow}
+											>
+												Unffollow
+											</button>
+										) : (
+											<button
+												className='px-2 rounded-md bg-gray-300 font-semibold'
+												onClick={handleFollow}
+											>
+												Follow
+											</button>
+										)}
 										<button className='px-2 rounded-md bg-gray-300 font-semibold'>
 											Message
 										</button>
@@ -101,15 +157,22 @@ export default function UserProfile() {
 
 								<div className='flex gap-3 text-center mt-2'>
 									<div>
-										<p className='text-gray-900 font-semibold '>1546</p>
+										<p className='text-gray-900 font-semibold '>
+											{posts.length}
+										</p>
 										<h3 className='text-gray-700'>Posts</h3>
 									</div>
-									<div>
-										<p className='text-gray-900 font-semibold '>1546</p>
+									<div onClick={toggleFollowing}>
+										<p className='text-gray-900 font-semibold '>
+											{visualFollows}
+										</p>
 										<h3 className='text-gray-700'>Follows</h3>
 									</div>
-									<div>
-										<p className='text-gray-900 font-semibold '>1546</p>
+
+									<div onClick={toggleFollowers}>
+										<p className='text-gray-900 font-semibold '>
+											{visualFollowers}
+										</p>
 										<h3 className='text-gray-700'>Followers</h3>
 									</div>
 								</div>
@@ -122,10 +185,6 @@ export default function UserProfile() {
 											options ? '' : 'hidden'
 										}`}
 									>
-										{/* <BsTriangleFill
-											className='absolute -top-4 right-0 shadow-xl text-gray-300 -z-10'
-											size={20}
-										/> */}
 										<Link to='/settings'>
 											<div className='flex items-center gap-1'>
 												<CiSettings size={20} />
@@ -185,7 +244,21 @@ export default function UserProfile() {
 					<div>No posts yet</div>
 				)}
 			</div>
-			{editUser && <EditUser toggleEdit={toggleEdit} />}
+			{editUser && <EditUser toggle={toggleEdit} />}
+			{showFollowing && (
+				<FollowingList
+					toggle={toggleFollowing}
+					followedUsers={user!.following!}
+					setVisualFollows={setVisualFollows}
+					isOwnProfile={isOwnProfile}
+				/>
+			)}
+			{showFollowers && (
+				<FollowersList
+					toggle={toggleFollowers}
+					userFollowers={user!.followers!}
+				/>
+			)}
 		</div>
 	)
 }

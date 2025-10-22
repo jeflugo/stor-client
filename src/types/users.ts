@@ -5,6 +5,12 @@ export type TUserComment = {
 	content: string
 }
 
+export type TAuthor = {
+	_id?: string
+	username: string
+	avatar?: string
+}
+
 export type TUser = {
 	_id: string
 	name: string
@@ -13,6 +19,8 @@ export type TUser = {
 	password: string
 	avatar?: string
 	bio?: string
+	following?: TAuthor[]
+	followers?: TAuthor[]
 }
 
 export type TUserContext = {
