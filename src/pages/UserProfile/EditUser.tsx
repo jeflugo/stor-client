@@ -7,7 +7,7 @@ import { api } from '../../utils'
 import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
 
-export default function EditUser({ toggleEdit }: { toggleEdit: () => void }) {
+export default function EditUser({ toggle }: { toggle: () => void }) {
 	const { user, setUser } = useUser()
 	const [formData, setFormData] = useState({
 		username: user?.username,
@@ -41,7 +41,7 @@ export default function EditUser({ toggleEdit }: { toggleEdit: () => void }) {
 	}
 	return (
 		<div className='absolute top-0 left-0 bg-white w-screen h-screen px-2'>
-			<div onClick={toggleEdit} className='flex justify-end'>
+			<div onClick={toggle} className='flex justify-end'>
 				<CgClose size={30} />
 			</div>
 			<div>
