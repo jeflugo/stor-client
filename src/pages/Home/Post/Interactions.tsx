@@ -15,6 +15,7 @@ export default function Interactions({
 	setLikesAmount,
 	commentsAmount,
 	postAuthorId,
+	postTitle,
 }: {
 	toggleComments: () => void
 	likes: TAuthor[]
@@ -23,6 +24,7 @@ export default function Interactions({
 	setLikesAmount: React.Dispatch<React.SetStateAction<number>>
 	commentsAmount: number
 	postAuthorId: string
+	postTitle: string
 }) {
 	const { user } = useUser()
 	const [liked, setLiked] = useState(false)
@@ -47,6 +49,9 @@ export default function Interactions({
 		if (!liked) setLikesAmount(prev => prev + 1)
 		else setLikesAmount(prev => prev - 1)
 
+		//! if the user if the post author he/she wont get notified
+		if (user!._id === postAuthorId) return
+
 		//* NOTIFY USER
 		const notificationInfo: TNotification = {
 			author: {
@@ -55,7 +60,8 @@ export default function Interactions({
 				avatar: user!.avatar,
 			},
 			type: liked ? 'deleteLike' : 'like',
-			contentId: postId,
+			postId,
+			postTitle,
 		}
 
 		const { data: notificationData } = await api.patch(

@@ -1,7 +1,13 @@
 import { LuArrowLeft } from 'react-icons/lu'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import type { TNotification } from '../../types/users'
+import { formatTimeAgo } from '../../utils'
 
-export default function Notifications() {
+export default function Notifications({
+	notifications,
+}: {
+	notifications: TNotification[]
+}) {
 	const navigate = useNavigate()
 	return (
 		<div>
@@ -11,18 +17,42 @@ export default function Notifications() {
 					<h2 className='text-xl'>Notifications</h2>
 				</div>
 				<div>
-					<div className='flex gap-2 items-center'>
-						<img
-							src='/user.png'
-							alt=''
-							className='h-15 w-15 rounded-full border-2 border-blue-500 p-[1px] '
-						/>
-						<p className='text-sm '>
-							<span className='font-bold'>Jeferson</span> liked your comment:
-							Lorem ipsum dolor sit amet consectetur adipisicing elit
-							<span className='text-gray-500'> 12 min</span>
-						</p>
-					</div>
+					{notifications.length > 0 ? (
+						<div>
+							{notifications.map(notification => {
+								const { author, postId, postTitle, type } = notification
+								return (
+									<Link to={`/posts/${postId}`} key={notification._id!}>
+										<div className='flex gap-2 items-center'>
+											<img
+												src={`${
+													author.avatar ? '/user.png' : '/default-user.png'
+												}`}
+												alt='User avatar'
+												className={`w-15 h-15 rounded-full `}
+											/>
+											<div>
+												<h4>
+													<span className='font-bold'>{author.username} </span>
+													<span className='text-gray-500 text-sm'>
+														{formatTimeAgo(notification.createdAt!)}
+													</span>
+												</h4>
+												{type === 'like' && (
+													<p>
+														Liked your post{' '}
+														<span className='font-bold'>{postTitle}</span>
+													</p>
+												)}
+											</div>
+										</div>
+									</Link>
+								)
+							})}
+						</div>
+					) : (
+						<div className='text-center'>Nothing to show</div>
+					)}
 				</div>
 			</div>
 		</div>

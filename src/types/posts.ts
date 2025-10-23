@@ -44,20 +44,3 @@ export type TPostEditorInfo = {
 	content: string
 	media: File | null
 }
-
-export type TPostContext = {
-	showDeletePost: boolean
-	toggleDeletePost: () => void
-	deletePost: () => void
-	deletedPosts: string[]
-	targetedPostId: string | undefined
-	setTargetedPostId: React.Dispatch<React.SetStateAction<string | undefined>>
-
-	showPostEditor: boolean
-	togglePostEditor: () => void
-	editPost: () => void
-	postEditorInfo: TPostEditorInfo
-	setPostEditorInfo: React.Dispatch<React.SetStateAction<TPostEditorInfo>>
-	visibleUpdatedPost: TPostEditorInfo
-	updateVisiblePost: (postData: TPostEditorInfo) => void
-}

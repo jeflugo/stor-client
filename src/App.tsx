@@ -29,12 +29,16 @@ export default function App() {
 }
 
 const Routing = () => {
+	const { user } = useUser()
 	return (
 		<main>
 			<Suspense fallback={<Loading />}>
 				<Routes>
 					<Route path='/' element={<Home />} />
-					<Route path='/notifications' element={<Notifications />} />
+					<Route
+						path='/notifications'
+						element={<Notifications notifications={user!.notifications} />}
+					/>
 					<Route path='/inbox' element={<Inbox />} />
 					<Route path='/:username' element={<UserProfile />} />
 					<Route path='/market' element={<Market />} />

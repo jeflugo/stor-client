@@ -4,6 +4,7 @@ import { FaBookmark, FaHeart, FaRegBookmark, FaRegHeart } from 'react-icons/fa'
 import { RiMessage3Line } from 'react-icons/ri'
 import type { TAuthor } from '../../types/posts'
 import { useUser } from '../../context/UserContext'
+import type { TNotification } from '../../types/users'
 import { api } from '../../utils'
 
 export default function Interactions({
@@ -12,12 +13,16 @@ export default function Interactions({
 	likesAmount,
 	commentsAmount,
 	setLikesAmount,
+	postTitle,
+	postAuthorId,
 }: {
 	likes: TAuthor[]
 	postId: string
 	likesAmount: number
 	commentsAmount: number
 	setLikesAmount: React.Dispatch<React.SetStateAction<number>>
+	postTitle: string
+	postAuthorId: string
 }) {
 	const { user } = useUser()
 	const { _id } = user!
@@ -29,10 +34,10 @@ export default function Interactions({
 		if (isLiked !== -1) setLiked(true)
 	}, [_id, likes])
 
-	const toggleLike = async () => {
+	const handleLike = async () => {
 		const requestInfo = {
 			type: 'like',
-			author: _id,
+			author: user!._id,
 		}
 
 		const { data } = await api.patch(`/posts/actions/${postId}`, requestInfo)
@@ -42,16 +47,38 @@ export default function Interactions({
 		setLiked(!liked)
 		if (!liked) setLikesAmount(prev => prev + 1)
 		else setLikesAmount(prev => prev - 1)
+
+		//! if the user if the post author he/she wont get notified
+		if (user!._id === postAuthorId) return
+
+		//* NOTIFY USER
+		const notificationInfo: TNotification = {
+			author: {
+				_id: user!._id,
+				username: user!.username,
+				avatar: user!.avatar,
+			},
+			type: liked ? 'deleteLike' : 'like',
+			postId,
+			postTitle,
+		}
+
+		const { data: notificationData } = await api.patch(
+			`/users/notify-user/${postAuthorId}`,
+			notificationInfo
+		)
+		if (!notificationData) console.log('Post Like notification error')
 	}
+
 	const toggleSaved = () => setSaved(!saved)
 	return (
 		<div className='px-2'>
 			<div className='flex justify-between my-2'>
 				<div className='flex gap-2'>
 					{liked ? (
-						<FaHeart size={25} onClick={toggleLike} color='red' />
+						<FaHeart size={25} onClick={handleLike} color='red' />
 					) : (
-						<FaRegHeart size={25} onClick={toggleLike} />
+						<FaRegHeart size={25} onClick={handleLike} />
 					)}
 					<RiMessage3Line size={25} />
 					<BsShare size={25} />

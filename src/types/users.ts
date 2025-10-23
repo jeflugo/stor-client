@@ -1,10 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react'
 
-export type TUserComment = {
-	postId: string
-	content: string
-}
-
 export type TAuthor = {
 	_id?: string
 	username: string
@@ -12,10 +7,14 @@ export type TAuthor = {
 }
 
 export type TNotification = {
+	_id?: string
 	author: TAuthor
 	type: string
-	contentId: string
+	postId: string
+	postTitle?: string
+	commentId?: string
 	content?: string
+	createdAt?: Date | string
 }
 
 export type TUser = {
@@ -28,6 +27,7 @@ export type TUser = {
 	bio?: string
 	following?: TAuthor[]
 	followers?: TAuthor[]
+	notifications: TNotification[]
 }
 
 export type TUserContext = {
