@@ -92,27 +92,22 @@ export default function Header({
 										Edit post
 									</p>
 								</div>
-								<div onClick={toggleDelete}>
-									<div className='flex items-center gap-1 text-red-500'>
-										<CiTrash size={20} />
-										<p className='hover:opacity-50 active:opacity-50'>
-											Delete post
+								{showDelete ? (
+									<div className='flex gap-2'>
+										<p onClick={handleDelete} className='text-red-500'>
+											Confirm
 										</p>
+										<p onClick={toggleDelete}>Cancel</p>
 									</div>
+								) : (
 									<div
-										className={`absolute bg-white top-15 right-0 shadow-xl border border-gray-200 rounded-sm ${
-											showDelete ? '' : 'hidden'
-										}`}
+										className='flex items-center gap-1 text-red-500'
+										onClick={toggleDelete}
 									>
-										<div className='flex px-3 py-1 gap-2'>
-											<h4 className='font-bold'>Confirm</h4>
-											<p onClick={handleDelete} className='text-red-500'>
-												yes
-											</p>
-											<p>no</p>
-										</div>
+										<CiTrash size={20} />
+										<p>Delete post</p>
 									</div>
-								</div>
+								)}
 							</>
 						) : (
 							<div className='flex items-center gap-1'>
