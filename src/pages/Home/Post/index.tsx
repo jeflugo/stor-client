@@ -42,6 +42,7 @@ export default function Post({
 				likesAmount={likesAmount}
 				setLikesAmount={setLikesAmount}
 				commentsAmount={commentsAmount}
+				postAuthorId={author._id!}
 			/>
 			{showComments && (
 				<Comments

@@ -5,6 +5,7 @@ import { RiMessage3Line } from 'react-icons/ri'
 import { useUser } from '../../../context/UserContext'
 import type { TAuthor } from '../../../types/posts'
 import { api } from '../../../utils'
+import type { TNotification } from '../../../types/users'
 
 export default function Interactions({
 	toggleComments,
@@ -13,6 +14,7 @@ export default function Interactions({
 	likesAmount,
 	setLikesAmount,
 	commentsAmount,
+	postAuthorId,
 }: {
 	toggleComments: () => void
 	likes: TAuthor[]
@@ -20,21 +22,21 @@ export default function Interactions({
 	likesAmount: number
 	setLikesAmount: React.Dispatch<React.SetStateAction<number>>
 	commentsAmount: number
+	postAuthorId: string
 }) {
 	const { user } = useUser()
-	const { _id } = user!
 	const [liked, setLiked] = useState(false)
 	const [saved, setSaved] = useState(false)
 
 	useEffect(() => {
-		const isLiked = likes.findIndex(like => like._id === _id)
+		const isLiked = likes.findIndex(like => like._id === user!._id)
 		if (isLiked !== -1) setLiked(true)
-	}, [_id, likes])
+	}, [user, likes])
 
 	const toggleLike = async () => {
 		const requestInfo = {
 			type: 'like',
-			author: _id,
+			author: user!._id,
 		}
 
 		const { data } = await api.patch(`/posts/actions/${postId}`, requestInfo)
@@ -44,6 +46,23 @@ export default function Interactions({
 		setLiked(!liked)
 		if (!liked) setLikesAmount(prev => prev + 1)
 		else setLikesAmount(prev => prev - 1)
+
+		//* NOTIFY USER
+		const notificationInfo: TNotification = {
+			author: {
+				_id: user!._id,
+				username: user!.username,
+				avatar: user!.avatar,
+			},
+			type: liked ? 'deleteLike' : 'like',
+			contentId: postId,
+		}
+
+		const { data: notificationData } = await api.patch(
+			`/users/notify-user/${postAuthorId}`,
+			notificationInfo
+		)
+		if (!notificationData) console.log('Post Like notification error')
 	}
 	const toggleSaved = () => setSaved(!saved)
 	return (

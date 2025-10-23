@@ -11,6 +11,13 @@ export type TAuthor = {
 	avatar?: string
 }
 
+export type TNotification = {
+	author: TAuthor
+	type: string
+	contentId: string
+	content?: string
+}
+
 export type TUser = {
 	_id: string
 	name: string
