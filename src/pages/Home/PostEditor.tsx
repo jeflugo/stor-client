@@ -1,11 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
-import type { TFormData } from '../../types/posts'
+import type { TFormData, TPostEditorInfo } from '../../types/posts'
 import { CgClose } from 'react-icons/cg'
 import toast from 'react-hot-toast'
-import { usePost } from '../../context/PostContext'
 import { api } from '../../utils'
 
-export default function PostEditor() {
+export default function PostEditor({
+	postEditorInfo,
+	setVisibleUpdatedPost,
+	togglePostEditor,
+}: {
+	postEditorInfo: TPostEditorInfo
+	setVisibleUpdatedPost: React.Dispatch<React.SetStateAction<TPostEditorInfo>>
+	togglePostEditor: () => void
+}) {
 	const fileInputRef = useRef<HTMLInputElement>(null)
 	const [mediaPreview, setMediaPreview] = useState<string | null>(null)
 	const [isLoading, setIsLoading] = useState(false)
@@ -16,8 +23,6 @@ export default function PostEditor() {
 		content: '',
 		media: null,
 	})
-
-	const { togglePostEditor, postEditorInfo, updateVisiblePost } = usePost()
 
 	useEffect(() => {
 		setFormData({
@@ -95,12 +100,12 @@ export default function PostEditor() {
 			media,
 		}
 
-		const { data } = await api.patch(`/posts/${postEditorInfo.id}`, postData)
+		const { data } = await api.patch(`/posts/${postEditorInfo._id}`, postData)
 		if (!data) return console.log('edit error')
 
-		updateVisiblePost({
+		setVisibleUpdatedPost({
 			...postData,
-			id: postEditorInfo.id,
+			_id: postEditorInfo._id,
 		})
 
 		// Reset form

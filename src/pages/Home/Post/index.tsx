@@ -3,9 +3,19 @@ import Body from './Body'
 import Interactions from './Interactions'
 import Comments from './Comments'
 import { useState } from 'react'
-import type { TPost } from '../../../types/posts'
+import type { TPost, TPostEditorInfo } from '../../../types/posts'
 
-export default function Post({ post }: { post: TPost }) {
+export default function Post({
+	post,
+	handleDelete,
+	togglePostEditor,
+	setPostEditorInfo,
+}: {
+	post: TPost
+	handleDelete: (postId: string) => void
+	togglePostEditor: () => void
+	setPostEditorInfo: React.Dispatch<React.SetStateAction<TPostEditorInfo>>
+}) {
 	const [showComments, setShowComments] = useState(false)
 	const toggleComments = () => setShowComments(!showComments)
 	const [likesAmount, setLikesAmount] = useState(post.likes.length)
@@ -20,6 +30,9 @@ export default function Post({ post }: { post: TPost }) {
 				postId={_id}
 				title={title}
 				content={content}
+				handleDelete={handleDelete}
+				togglePostEditor={togglePostEditor}
+				setPostEditorInfo={setPostEditorInfo}
 			/>
 			<Body title={title} content={content} />
 			<Interactions

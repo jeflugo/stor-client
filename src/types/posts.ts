@@ -39,7 +39,7 @@ export type TFormData = {
 }
 
 export type TPostEditorInfo = {
-	id: string
+	_id: string
 	title: string
 	content: string
 	media: File | null

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 
-import type { TAuthor } from '../../../types/posts'
+import type { TAuthor, TPostEditorInfo } from '../../../types/posts'
 import { HiOutlineDotsVertical } from 'react-icons/hi'
 import { useEffect, useState } from 'react'
 import { useUser } from '../../../context/UserContext'
@@ -8,7 +8,6 @@ import { IoAlertCircleOutline } from 'react-icons/io5'
 import { MdOutlineEdit } from 'react-icons/md'
 import { CiTrash } from 'react-icons/ci'
 import { formatTimeAgo } from '../../../utils'
-import { usePost } from '../../../context/PostContext'
 // import { FaStar } from 'react-icons/fa'
 // import { RiExpandDiagonalLine } from 'react-icons/ri'
 
@@ -19,6 +18,9 @@ export default function Header({
 	postId,
 	title,
 	content,
+	handleDelete,
+	togglePostEditor,
+	setPostEditorInfo,
 }: {
 	author: TAuthor
 	createdAt: string
@@ -26,27 +28,24 @@ export default function Header({
 	postId: string
 	title: string
 	content: string
+	handleDelete: (postId: string) => void
+	togglePostEditor: () => void
+	setPostEditorInfo: React.Dispatch<React.SetStateAction<TPostEditorInfo>>
 }) {
 	const { _id, username, avatar } = author
 	const { user } = useUser()
 	const [options, setOptions] = useState(false)
 	const [itsOwnPost, setItsOwnPost] = useState(false)
-
-	const {
-		toggleDeletePost,
-		setTargetedPostId,
-		togglePostEditor,
-		setPostEditorInfo,
-	} = usePost()
+	const [showDelete, setShowDelete] = useState(false)
 
 	useEffect(() => {
 		if (_id === user?._id) setItsOwnPost(true)
 	}, [_id, user])
 
 	const toggleOptions = () => setOptions(!options)
-	const handlePostEditor = () => {
+	const handleClickEdit = () => {
 		setPostEditorInfo({
-			id: postId,
+			_id: postId,
 			title,
 			content,
 			media: null,
@@ -54,10 +53,7 @@ export default function Header({
 		togglePostEditor()
 		toggleOptions()
 	}
-	const handleDeletePost = () => {
-		setTargetedPostId(postId)
-		toggleDeletePost()
-	}
+	const toggleDelete = () => setShowDelete(!showDelete)
 	return (
 		<div className='flex justify-between items-center px-2'>
 			<div className='flex items-center gap-2'>
@@ -95,22 +91,32 @@ export default function Header({
 							<>
 								<div
 									className='flex items-center gap-1'
-									onClick={handlePostEditor}
+									onClick={handleClickEdit}
 								>
 									<MdOutlineEdit size={20} />
 									<p className='hover:opacity-50 active:opacity-50'>
 										Edit post
 									</p>
 								</div>
-								<div
-									className='flex items-center gap-1 text-red-500'
-									onClick={handleDeletePost}
-								>
-									<CiTrash size={20} />
-									<p className='hover:opacity-50 active:opacity-50'>
-										Delete post
-									</p>
-								</div>
+								{showDelete ? (
+									<div className='flex gap-2'>
+										<p
+											onClick={() => handleDelete(postId)}
+											className='text-red-500'
+										>
+											Confirm
+										</p>
+										<p onClick={toggleDelete}>Cancel</p>
+									</div>
+								) : (
+									<div
+										className='flex items-center gap-1 text-red-500'
+										onClick={toggleDelete}
+									>
+										<CiTrash size={20} />
+										<p>Delete post</p>
+									</div>
+								)}
 							</>
 						) : (
 							<div className='flex items-center gap-1'>
