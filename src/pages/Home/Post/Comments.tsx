@@ -4,15 +4,18 @@ import { useEffect, useRef, useState } from 'react'
 import type { TComment } from '../../../types/posts'
 import { useUser } from '../../../context/UserContext'
 import { api } from '../../../utils'
+import type { TNotification } from '../../../types/users'
 
 export default function Comment({
 	toggleComments,
 	postId,
 	setCommentsAmount,
+	postAuthorId,
 }: {
 	toggleComments: () => void
 	postId: string
 	setCommentsAmount: React.Dispatch<React.SetStateAction<number>>
+	postAuthorId: string
 }) {
 	const { user } = useUser()
 	const [commentContent, setCommentContent] = useState('')
@@ -66,16 +69,37 @@ export default function Comment({
 			content: commentContent,
 		}
 
-		const { data: newComment } = await api.patch(
+		const { data: newComment }: { data: TComment } = await api.patch(
 			`/posts/actions/${postId}`,
 			requestInfo
 		)
 		if (!newComment) return console.log('error')
 
-		console.log(newComment)
 		setOwnComments(prev => [newComment, ...prev])
 		setCommentContent('')
 		setCommentsAmount(prev => prev + 1)
+
+		//! if the user if the post author he/she wont get notified
+		if (user!._id === postAuthorId) return
+
+		//* NOTIFY USER
+		const notificationInfo: TNotification = {
+			author: {
+				_id: user!._id,
+				username: user!.username,
+				avatar: user!.avatar,
+			},
+			type: 'comment',
+			postId,
+			commentId: newComment._id!,
+			content: commentContent,
+		}
+
+		const { data: notificationData } = await api.patch(
+			`/users/notify-user/${postAuthorId}`,
+			notificationInfo
+		)
+		if (!notificationData) console.log('Post Like notification error')
 	}
 
 	return (
@@ -103,6 +127,7 @@ export default function Comment({
 							commentId={_id!}
 							likes={likes}
 							setCommentsAmount={setCommentsAmount}
+							postAuthorId={postAuthorId}
 						/>
 					))}
 				{comments.length > 0 &&
@@ -116,6 +141,7 @@ export default function Comment({
 							commentId={_id!}
 							likes={likes}
 							setCommentsAmount={setCommentsAmount}
+							postAuthorId={postAuthorId}
 						/>
 					))}
 			</div>

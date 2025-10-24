@@ -50,6 +50,7 @@ export default function Post({
 					toggleComments={toggleComments}
 					postId={_id}
 					setCommentsAmount={setCommentsAmount}
+					postAuthorId={author._id!}
 				/>
 			)}
 		</div>

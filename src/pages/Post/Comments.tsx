@@ -1,5 +1,6 @@
 import { useUser } from '../../context/UserContext'
 import type { TComment } from '../../types/posts'
+import type { TNotification } from '../../types/users'
 import { api } from '../../utils'
 import SingleComment from './SingleComment'
 import { useEffect, useRef, useState } from 'react'
@@ -7,9 +8,11 @@ import { useEffect, useRef, useState } from 'react'
 export default function Comment({
 	postId,
 	setCommentsAmount,
+	postAuthorId,
 }: {
 	postId: string
 	setCommentsAmount: React.Dispatch<React.SetStateAction<number>>
+	postAuthorId: string
 }) {
 	const { user } = useUser()
 	const [commentContent, setCommentContent] = useState('')
@@ -46,6 +49,28 @@ export default function Comment({
 		setOwnComments(prev => [newComment, ...prev])
 		setCommentContent('')
 		setCommentsAmount(prev => prev + 1)
+
+		//! if the user if the post author he/she wont get notified
+		if (user!._id === postAuthorId) return
+
+		//* NOTIFY USER
+		const notificationInfo: TNotification = {
+			author: {
+				_id: user!._id,
+				username: user!.username,
+				avatar: user!.avatar,
+			},
+			type: 'comment',
+			postId,
+			commentId: newComment._id!,
+			content: commentContent,
+		}
+
+		const { data: notificationData } = await api.patch(
+			`/users/notify-user/${postAuthorId}`,
+			notificationInfo
+		)
+		if (!notificationData) console.log('Post Like notification error')
 	}
 
 	return (
@@ -65,6 +90,7 @@ export default function Comment({
 							commentId={_id!}
 							likes={likes}
 							setCommentsAmount={setCommentsAmount}
+							postAuthorId={postAuthorId}
 						/>
 					))}
 				{comments.length > 0 &&
@@ -78,6 +104,7 @@ export default function Comment({
 							commentId={_id!}
 							likes={likes}
 							setCommentsAmount={setCommentsAmount}
+							postAuthorId={postAuthorId}
 						/>
 					))}
 			</div>

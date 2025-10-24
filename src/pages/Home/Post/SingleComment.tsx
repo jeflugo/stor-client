@@ -6,6 +6,7 @@ import { useUser } from '../../../context/UserContext'
 import { MdOutlineEdit } from 'react-icons/md'
 import { CgClose } from 'react-icons/cg'
 import { CiTrash } from 'react-icons/ci'
+import type { TNotification } from '../../../types/users'
 
 export default function SingleComment({
 	author,
@@ -15,6 +16,7 @@ export default function SingleComment({
 	commentId,
 	likes,
 	setCommentsAmount,
+	postAuthorId,
 }: {
 	author: TAuthor
 	content: string
@@ -23,6 +25,7 @@ export default function SingleComment({
 	commentId: string
 	likes: TAuthor[]
 	setCommentsAmount: React.Dispatch<React.SetStateAction<number>>
+	postAuthorId: string
 }) {
 	const [liked, setLiked] = useState(false)
 	const [isEditing, setIsEditing] = useState(false)
@@ -77,6 +80,27 @@ export default function SingleComment({
 		if (!data) console.log('server error editing')
 		setDeleted(true)
 		setCommentsAmount(prev => prev - 1)
+
+		//! if the user if the post author he/she wont get notified
+		if (user!._id === postAuthorId) return
+
+		//* NOTIFY USER
+		const notificationInfo: TNotification = {
+			author: {
+				_id: user!._id,
+				username: user!.username,
+				avatar: user!.avatar,
+			},
+			type: 'deleteComment',
+			postId,
+			commentId,
+		}
+
+		const { data: notificationData } = await api.patch(
+			`/users/notify-user/${postAuthorId}`,
+			notificationInfo
+		)
+		if (!notificationData) console.log('Post Like notification error')
 	}
 	return (
 		<div

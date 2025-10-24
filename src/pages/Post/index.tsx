@@ -55,7 +55,11 @@ export default function Post() {
 				postTitle={title}
 				postAuthorId={author._id!}
 			/>
-			<Comments postId={_id} setCommentsAmount={setCommentsAmount} />
+			<Comments
+				postId={_id}
+				setCommentsAmount={setCommentsAmount}
+				postAuthorId={author._id!}
+			/>
 			{showPostEditor && (
 				<PostEditor
 					togglePostEditor={togglePostEditor}
