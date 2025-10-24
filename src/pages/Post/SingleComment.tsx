@@ -55,6 +55,28 @@ export default function SingleComment({
 		if (!data) console.log('error')
 
 		setLiked(!liked)
+
+		//! if the user if the post author he/she wont get notified
+		if (user!._id === author._id) return
+
+		//* NOTIFY USER
+		const notificationInfo: TNotification = {
+			author: {
+				_id: user!._id,
+				username: user!.username,
+				avatar: user!.avatar,
+			},
+			type: liked ? 'deleteLikeComment' : 'likeComment',
+			postId,
+			commentId,
+			content,
+		}
+
+		const { data: notificationData } = await api.patch(
+			`/users/notify-user/${author._id}`,
+			notificationInfo
+		)
+		if (!notificationData) console.log('Post Like notification error')
 	}
 	const toggleEditing = () => setIsEditing(!isEditing)
 
