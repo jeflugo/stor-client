@@ -18,6 +18,7 @@ export default function SingleComment({
 	likes,
 	setCommentsAmount,
 	postAuthorId,
+	isHighlighted,
 }: {
 	author: TAuthor
 	content: string
@@ -27,6 +28,7 @@ export default function SingleComment({
 	likes: TAuthor[]
 	setCommentsAmount: React.Dispatch<React.SetStateAction<number>>
 	postAuthorId: string
+	isHighlighted?: boolean
 }) {
 	const [liked, setLiked] = useState(false)
 	const [isEditing, setIsEditing] = useState(false)
@@ -128,8 +130,8 @@ export default function SingleComment({
 	return (
 		<div
 			className={`flex px-2 mb-2 justify-between items-start ${
-				deleted ? 'hidden' : ''
-			}`}
+				isHighlighted ? 'bg-amber-400/50' : ''
+			} ${deleted ? 'hidden' : ''}`}
 		>
 			<div className='flex gap-2'>
 				<div>

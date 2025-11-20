@@ -3,7 +3,7 @@ import Body from './Body'
 import Interactions from './Interactions'
 import Comments from './Comments'
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { api } from '../../utils'
 import type { TPost } from '../../types/posts'
 import { LuArrowLeft } from 'react-icons/lu'
@@ -17,6 +17,9 @@ export default function Post() {
 	const [showPostEditor, setShowPostEditor] = useState(false)
 
 	const { postId } = useParams<{ postId: string }>()
+	const [searchParams] = useSearchParams()
+	const highlightedCommentId = searchParams.get('highlightedCommentId')
+
 	useEffect(() => {
 		const fetchPost = async () => {
 			const { data }: { data: TPost } = await api.get(
@@ -59,6 +62,7 @@ export default function Post() {
 				postId={_id}
 				setCommentsAmount={setCommentsAmount}
 				postAuthorId={author._id!}
+				highlightedCommentId={highlightedCommentId}
 			/>
 			{showPostEditor && (
 				<PostEditor

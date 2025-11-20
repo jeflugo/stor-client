@@ -20,11 +20,16 @@ export default function Notifications({
 					{notifications.length > 0 ? (
 						<div>
 							{notifications.map(notification => {
-								const { author, postId, postTitle, type, content } =
+								const { author, postId, postTitle, type, content, commentId } =
 									notification
 								return (
-									<Link to={`/posts/${postId}`} key={notification._id!}>
-										<div className='flex gap-2 items-center'>
+									<Link
+										to={`/posts/${postId}${
+											commentId ? `?highlightedCommentId=${commentId}` : ''
+										}`}
+										key={notification._id!}
+									>
+										<div className='flex gap-2 items-center mb-3'>
 											<img
 												src={`${
 													author.avatar ? '/user.png' : '/default-user.png'
@@ -48,6 +53,12 @@ export default function Notifications({
 												{type === 'comment' && (
 													<p>
 														Comment on your post:{' '}
+														<span className='font-bold'>{content}</span>
+													</p>
+												)}
+												{type === 'likeComment' && (
+													<p>
+														Liked your comment:{' '}
 														<span className='font-bold'>{content}</span>
 													</p>
 												)}
