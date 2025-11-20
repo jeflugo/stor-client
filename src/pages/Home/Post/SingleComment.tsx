@@ -7,6 +7,7 @@ import { MdOutlineEdit } from 'react-icons/md'
 import { CgClose } from 'react-icons/cg'
 import { CiTrash } from 'react-icons/ci'
 import type { TNotification } from '../../../types/users'
+import { Link } from 'react-router-dom'
 
 export default function SingleComment({
 	author,
@@ -140,7 +141,9 @@ export default function SingleComment({
 				</div>
 				<div>
 					<h4 className='flex items-center gap-1'>
-						<span className='font-bold'>{username}</span>
+						<Link to={`/${username}`}>
+							<span className='font-bold'>{username}</span>
+						</Link>
 						<span className='text-sm text-gray-600'>
 							• {formatTimeAgo(createdAt)}
 						</span>
