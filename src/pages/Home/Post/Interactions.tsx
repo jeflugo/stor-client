@@ -89,16 +89,18 @@ export default function Interactions({
 					<FaRegBookmark size={25} onClick={toggleSaved} />
 				)}
 			</div>
-			{likesAmount > 0 && (
-				<div className='flex gap-4'>
-					<p className='font-bold'>{likesAmount} Likes</p>
-				</div>
-			)}
-			{commentsAmount > 0 && (
-				<div onClick={toggleComments}>
-					<p>see {commentsAmount} comments</p>
-				</div>
-			)}
+			<div className='flex gap-1'>
+				{likesAmount > 0 && (
+					<div className='flex gap-4'>
+						<p className='font-bold'>{likesAmount} Likes</p>
+					</div>
+				)}
+				{commentsAmount > 0 && (
+					<div onClick={toggleComments}>
+						<p>• see {commentsAmount} comments</p>
+					</div>
+				)}
+			</div>
 		</div>
 	)
 }
